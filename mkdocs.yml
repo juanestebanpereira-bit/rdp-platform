@@ -1,0 +1,34 @@
+site_name: Retail Data Platform
+docs_dir: docs
+hooks:
+  - hooks.py
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - toc.integrate
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_javascript:
+  - javascripts/mermaid-config.js
+
+nav:
+  - Home: index.md
+  - Products:
+    - Product Hierarchy:
+      - Summary: subject_areas/products/product_hierarchy/summary.md
+      - ERD: subject_areas/products/product_hierarchy/erd.md
+      - Dictionary: subject_areas/products/product_hierarchy/dictionary.md
+      - Lineage: subject_areas/products/product_hierarchy/lineage.md
+  - Reference:
+    - Implementation Guide: reference/contract.md
+    - Data Model Index: reference/data_model_index.md
+    - Style Guide: reference/style_guide.md

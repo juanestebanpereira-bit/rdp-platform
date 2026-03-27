@@ -1,0 +1,4305 @@
+{
+  "metadata": {
+    "colibri_version": "0.2.8",
+    "generated_at": "2026-03-27T17:50:31Z",
+    "adapter_type": "bigquery",
+    "dbt_version": "1.11.7",
+    "dbt_schema_version": "https://schemas.getdbt.com/dbt/manifest/v12.json",
+    "dbt_invocation_id": "80c29a06-181a-4ce7-b4d2-b60496da7deb",
+    "dbt_project_name": "merged_product_hierarchy",
+    "dbt_project_id": "c90a1852a3714972ff565bc0302ad295"
+  },
+  "nodes": {
+    "model.rtl_rdp_client.stg_departments": {
+      "id": "model.rtl_rdp_client.stg_departments",
+      "name": "stg_departments",
+      "fullName": "model.rtl_rdp_client.stg_departments",
+      "nodeType": "model",
+      "materialized": "view",
+      "modelType": "staging",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_staging",
+      "path": "models/staging/products/product_hierarchy/stg_departments.sql",
+      "description": "Staged department data mapped to RDP contract schema. Derived from distinct product categories in the Olist products table for prototype purposes.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- stg_departments.sql\n-- =============================================================================\n-- Maps Olist product categories to RDP department staging contract.\n-- Since Olist does not have a dedicated departments table, departments\n-- are derived from distinct product category names in the products table.\n--\n-- Prototype mapping:\n--   product_category_name \u2192 department_id, department_number, department_name\n--\n-- Component:  Product Hierarchy\n-- Owner:      Customer\n-- Reads from: merchandising.olist_products_dataset\n-- =============================================================================\n\nWITH source AS (\n    -- Pull distinct categories from products table\n    SELECT DISTINCT\n        product_category_name\n    FROM {{ source('merchandising', 'olist_products_dataset') }}\n    WHERE product_category_name IS NOT NULL\n),\n\nrenamed AS (\n    SELECT\n        -- Use category name as id since no natural key exists\n        product_category_name               AS department_id,\n\n        -- Use category name as number for prototype\n        -- In production this would be a real department number\n        product_category_name               AS department_number,\n\n        -- Use category name as display name\n        product_category_name               AS department_name,\n\n        'Jack Smith'                        AS cust_department_manager,\n\n        'olist'                             AS rdp_source_system\n\n    FROM source\n)\n\nSELECT * FROM renamed",
+      "compiledCode": "-- =============================================================================\n-- stg_departments.sql\n-- =============================================================================\n-- Maps Olist product categories to RDP department staging contract.\n-- Since Olist does not have a dedicated departments table, departments\n-- are derived from distinct product category names in the products table.\n--\n-- Prototype mapping:\n--   product_category_name \u2192 department_id, department_number, department_name\n--\n-- Component:  Product Hierarchy\n-- Owner:      Customer\n-- Reads from: merchandising.olist_products_dataset\n-- =============================================================================\n\nWITH source AS (\n    -- Pull distinct categories from products table\n    SELECT DISTINCT\n        product_category_name\n    FROM `crested-sentry-489814-b6`.`olist_landing`.`olist_products_dataset`\n    WHERE product_category_name IS NOT NULL\n),\n\nrenamed AS (\n    SELECT\n        -- Use category name as id since no natural key exists\n        product_category_name               AS department_id,\n\n        -- Use category name as number for prototype\n        -- In production this would be a real department number\n        product_category_name               AS department_number,\n\n        -- Use category name as display name\n        product_category_name               AS department_name,\n\n        'Jack Smith'                        AS cust_department_manager,\n\n        'olist'                             AS rdp_source_system\n\n    FROM source\n)\n\nSELECT * FROM renamed",
+      "refs": [],
+      "columns": {
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a department. Primary key of the\ndepartment entity. Used as a foreign key in all tables that reference\ndepartments. May be a system-generated value not intended for display.",
+          "lineageType": "rename"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a department. Used in reports and\nuser interfaces. May differ from department_id which is an internal\nsystem identifier.",
+          "lineageType": "rename"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the department. Used as a label in reports and\nuser interfaces.",
+          "lineageType": "rename"
+        },
+        "cust_department_manager": {
+          "columnName": "cust_department_manager",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "unknown"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided this record. Set by the customer in the staging layer.",
+          "lineageType": "unknown"
+        }
+      }
+    },
+    "source.rtl_rdp_client.merchandising.olist_products_dataset": {
+      "id": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+      "name": "olist_products_dataset",
+      "fullName": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+      "nodeType": "source",
+      "materialized": "unknown",
+      "modelType": "unknown",
+      "database": "crested-sentry-489814-b6",
+      "schema": "olist_landing",
+      "path": "models/staging/sources.yml",
+      "description": "Raw product data.",
+      "contractEnforced": null,
+      "rawCode": null,
+      "compiledCode": null,
+      "refs": [],
+      "columns": {
+        "product_id": {
+          "columnName": "product_id",
+          "hasLineage": true,
+          "dataType": "STRING"
+        },
+        "product_category_name": {
+          "columnName": "product_category_name",
+          "hasLineage": true,
+          "dataType": "STRING"
+        },
+        "product_name_lenght": {
+          "columnName": "product_name_lenght",
+          "hasLineage": false,
+          "dataType": "INT64"
+        },
+        "product_description_lenght": {
+          "columnName": "product_description_lenght",
+          "hasLineage": false,
+          "dataType": "INT64"
+        },
+        "product_photos_qty": {
+          "columnName": "product_photos_qty",
+          "hasLineage": false,
+          "dataType": "INT64"
+        },
+        "product_weight_g": {
+          "columnName": "product_weight_g",
+          "hasLineage": false,
+          "dataType": "INT64"
+        },
+        "product_length_cm": {
+          "columnName": "product_length_cm",
+          "hasLineage": false,
+          "dataType": "INT64"
+        },
+        "product_height_cm": {
+          "columnName": "product_height_cm",
+          "hasLineage": false,
+          "dataType": "INT64"
+        },
+        "product_width_cm": {
+          "columnName": "product_width_cm",
+          "hasLineage": false,
+          "dataType": "INT64"
+        }
+      }
+    },
+    "model.rtl_rdp_client.stg_classes": {
+      "id": "model.rtl_rdp_client.stg_classes",
+      "name": "stg_classes",
+      "fullName": "model.rtl_rdp_client.stg_classes",
+      "nodeType": "model",
+      "materialized": "view",
+      "modelType": "staging",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_staging",
+      "path": "models/staging/products/product_hierarchy/stg_classes.sql",
+      "description": "Staged class data mapped to RDP contract schema. Loaded from seed file for prototype purposes.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- stg_classes.sql\n-- =============================================================================\n-- Maps Olist product categories to RDP class staging contract.\n-- For prototype purposes, classes mirror departments since Olist\n-- has no class-level data.\n--\n-- Component:  Product Hierarchy\n-- Owner:      Customer\n-- Reads from: merchandising.olist_products_dataset\n-- =============================================================================\n\nWITH source AS (\n    SELECT DISTINCT\n        product_category_name\n    FROM {{ source('merchandising', 'olist_products_dataset') }}\n    WHERE product_category_name IS NOT NULL\n),\n\nrenamed AS (\n    SELECT\n        product_category_name               AS class_id,\n        product_category_name               AS department_id,\n        product_category_name               AS class_number,\n        product_category_name               AS class_name,\n        'olist'                             AS rdp_source_system\n    FROM source\n)\n\nSELECT * FROM renamed",
+      "compiledCode": "-- =============================================================================\n-- stg_classes.sql\n-- =============================================================================\n-- Maps Olist product categories to RDP class staging contract.\n-- For prototype purposes, classes mirror departments since Olist\n-- has no class-level data.\n--\n-- Component:  Product Hierarchy\n-- Owner:      Customer\n-- Reads from: merchandising.olist_products_dataset\n-- =============================================================================\n\nWITH source AS (\n    SELECT DISTINCT\n        product_category_name\n    FROM `crested-sentry-489814-b6`.`olist_landing`.`olist_products_dataset`\n    WHERE product_category_name IS NOT NULL\n),\n\nrenamed AS (\n    SELECT\n        product_category_name               AS class_id,\n        product_category_name               AS department_id,\n        product_category_name               AS class_number,\n        product_category_name               AS class_name,\n        'olist'                             AS rdp_source_system\n    FROM source\n)\n\nSELECT * FROM renamed",
+      "refs": [
+        {
+          "name": "stg_departments",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a class. Primary key of the class entity.\nUsed as a foreign key in all tables that reference classes. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "rename"
+        },
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a department. Primary key of the\ndepartment entity. Used as a foreign key in all tables that reference\ndepartments. May be a system-generated value not intended for display.",
+          "lineageType": "rename"
+        },
+        "class_number": {
+          "columnName": "class_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a class. Used in reports and user\ninterfaces. May differ from class_id which is an internal system\nidentifier.",
+          "lineageType": "rename"
+        },
+        "class_name": {
+          "columnName": "class_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the class. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "rename"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided this record. Set by the customer in the staging layer.",
+          "lineageType": "unknown"
+        }
+      }
+    },
+    "model.rtl_rdp_client.stg_styles": {
+      "id": "model.rtl_rdp_client.stg_styles",
+      "name": "stg_styles",
+      "fullName": "model.rtl_rdp_client.stg_styles",
+      "nodeType": "model",
+      "materialized": "view",
+      "modelType": "staging",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_staging",
+      "path": "models/staging/products/product_hierarchy/stg_styles.sql",
+      "description": "Staged style data mapped to RDP contract schema. Loaded from seed file for prototype purposes.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- stg_styles.sql\n-- =============================================================================\n-- Maps Olist product data to RDP style staging contract.\n-- For prototype purposes, styles mirror items since Olist\n-- has no style-level data.\n--\n-- Component:  Product Hierarchy\n-- Owner:      Customer\n-- Reads from: merchandising.olist_products_dataset\n-- =============================================================================\n\nWITH source AS (\n    SELECT\n        product_id,\n        product_category_name\n    FROM {{ source('merchandising', 'olist_products_dataset') }}\n    WHERE product_id IS NOT NULL\n),\n\nrenamed AS (\n    SELECT\n        product_id                          AS style_id,\n        COALESCE(\n            product_category_name,\n            'NOT_ASSIGNED'\n        )                                   AS class_id,\n        product_id                          AS style_number,\n        COALESCE(\n            product_category_name,\n            'UNKNOWN'\n        )                                   AS style_name,\n        'olist'                             AS rdp_source_system\n    FROM source\n)\n\nSELECT * FROM renamed",
+      "compiledCode": "-- =============================================================================\n-- stg_styles.sql\n-- =============================================================================\n-- Maps Olist product data to RDP style staging contract.\n-- For prototype purposes, styles mirror items since Olist\n-- has no style-level data.\n--\n-- Component:  Product Hierarchy\n-- Owner:      Customer\n-- Reads from: merchandising.olist_products_dataset\n-- =============================================================================\n\nWITH source AS (\n    SELECT\n        product_id,\n        product_category_name\n    FROM `crested-sentry-489814-b6`.`olist_landing`.`olist_products_dataset`\n    WHERE product_id IS NOT NULL\n),\n\nrenamed AS (\n    SELECT\n        product_id                          AS style_id,\n        COALESCE(\n            product_category_name,\n            'NOT_ASSIGNED'\n        )                                   AS class_id,\n        product_id                          AS style_number,\n        COALESCE(\n            product_category_name,\n            'UNKNOWN'\n        )                                   AS style_name,\n        'olist'                             AS rdp_source_system\n    FROM source\n)\n\nSELECT * FROM renamed",
+      "refs": [
+        {
+          "name": "stg_classes",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "style_id": {
+          "columnName": "style_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a style. Primary key of the style entity.\nUsed as a foreign key in all tables that reference styles. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "rename"
+        },
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a class. Primary key of the class entity.\nUsed as a foreign key in all tables that reference classes. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "transformation"
+        },
+        "style_number": {
+          "columnName": "style_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a style. Used in reports and user\ninterfaces. May differ from style_id which is an internal system\nidentifier.",
+          "lineageType": "rename"
+        },
+        "style_name": {
+          "columnName": "style_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the style. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "transformation"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided this record. Set by the customer in the staging layer.",
+          "lineageType": "unknown"
+        }
+      }
+    },
+    "model.rtl_rdp_client.stg_items": {
+      "id": "model.rtl_rdp_client.stg_items",
+      "name": "stg_items",
+      "fullName": "model.rtl_rdp_client.stg_items",
+      "nodeType": "model",
+      "materialized": "view",
+      "modelType": "staging",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_staging",
+      "path": "models/staging/products/product_hierarchy/stg_items.sql",
+      "description": "Staged item data mapped to RDP contract schema. Each Olist product maps to one RDP item.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- stg_items.sql\n-- =============================================================================\n-- Maps Olist product data to RDP item staging contract.\n-- Each Olist product maps to one RDP item.\n--\n-- Component:  Product Hierarchy\n-- Owner:      Customer\n-- Reads from: merchandising.olist_products_dataset\n-- =============================================================================\n\nWITH source AS (\n    SELECT\n        product_id,\n        product_category_name\n    FROM {{ source('merchandising', 'olist_products_dataset') }}\n    WHERE product_id IS NOT NULL\n),\n\nrenamed AS (\n    SELECT\n        product_id                          AS item_id,\n        product_id                          AS style_id,\n        product_id                          AS item_number,\n        COALESCE(\n            product_category_name,\n            'Unknown'\n        )                                   AS item_name,\n        'olist'                             AS rdp_source_system\n    FROM source\n)\n\nSELECT * FROM renamed",
+      "compiledCode": "-- =============================================================================\n-- stg_items.sql\n-- =============================================================================\n-- Maps Olist product data to RDP item staging contract.\n-- Each Olist product maps to one RDP item.\n--\n-- Component:  Product Hierarchy\n-- Owner:      Customer\n-- Reads from: merchandising.olist_products_dataset\n-- =============================================================================\n\nWITH source AS (\n    SELECT\n        product_id,\n        product_category_name\n    FROM `crested-sentry-489814-b6`.`olist_landing`.`olist_products_dataset`\n    WHERE product_id IS NOT NULL\n),\n\nrenamed AS (\n    SELECT\n        product_id                          AS item_id,\n        product_id                          AS style_id,\n        product_id                          AS item_number,\n        COALESCE(\n            product_category_name,\n            'Unknown'\n        )                                   AS item_name,\n        'olist'                             AS rdp_source_system\n    FROM source\n)\n\nSELECT * FROM renamed",
+      "refs": [
+        {
+          "name": "stg_styles",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "item_id": {
+          "columnName": "item_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for an item. Primary key of the item entity.\nUsed as a foreign key in all tables that reference items. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "rename"
+        },
+        "style_id": {
+          "columnName": "style_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a style. Primary key of the style entity.\nUsed as a foreign key in all tables that reference styles. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "rename"
+        },
+        "item_number": {
+          "columnName": "item_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for an item. Used in reports and user\ninterfaces. May differ from item_id which is an internal system\nidentifier.",
+          "lineageType": "rename"
+        },
+        "item_name": {
+          "columnName": "item_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the item. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "transformation"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided this record. Set by the customer in the staging layer.",
+          "lineageType": "unknown"
+        }
+      }
+    },
+    "model.rtl_rdp.int_departments": {
+      "id": "model.rtl_rdp.int_departments",
+      "name": "int_departments",
+      "fullName": "model.rtl_rdp.int_departments",
+      "nodeType": "model",
+      "materialized": "table",
+      "modelType": "intermediate",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_temp",
+      "path": "models/temp/products/product_hierarchy/int_departments.sql",
+      "description": "",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- int_departments.sql\n-- =============================================================================\n-- Intermediate department model. Reads from stg_departments and adds\n-- audit columns. Customer columns from stg_departments pass through\n-- dynamically via customer_columns macro.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: rdp_staging.stg_departments\n-- =============================================================================\n\n{% set contract = ['department_id', 'department_number', 'department_name', 'rdp_source_system'] %}\n\nWITH source AS (\n    SELECT * FROM {{ source('rdp_staging', 'stg_departments') }}\n)\n\nSELECT\n    -- primary key\n    department_id,\n\n    -- attributes\n    department_number,\n    department_name,\n\n    -- customer columns passthrough\n    {% if has_customer_columns(source('rdp_staging', 'stg_departments'), contract) %}\n        {{ customer_columns(source('rdp_staging', 'stg_departments'), contract) }},\n    {% endif %}\n\n    -- system columns\n    rdp_source_system\n\nFROM source\n\nUNION ALL\n\nSELECT\n    'NOT_ASSIGNED'  AS department_id,\n    'NOT_ASSIGNED'  AS department_number,\n    'Not Assigned'  AS department_name,\n\n    {% if has_customer_columns(source('rdp_staging', 'stg_departments'), contract) %}\n        {{ sentinel_customer_columns(source('rdp_staging', 'stg_departments'), contract) }},\n    {% endif %}\n\n    'NOT_ASSIGNED'  AS rdp_source_system",
+      "compiledCode": "-- =============================================================================\n-- int_departments.sql\n-- =============================================================================\n-- Intermediate department model. Reads from stg_departments and adds\n-- audit columns. Customer columns from stg_departments pass through\n-- dynamically via customer_columns macro.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: rdp_staging.stg_departments\n-- =============================================================================\n\n\n\nWITH source AS (\n    SELECT * FROM `crested-sentry-489814-b6`.`dev_rdp_staging`.`stg_departments`\n)\n\nSELECT\n    -- primary key\n    department_id,\n\n    -- attributes\n    department_number,\n    department_name,\n\n    -- customer columns passthrough\n    \n        cust_department_manager,\n    \n\n    -- system columns\n    rdp_source_system\n\nFROM source\n\nUNION ALL\n\nSELECT\n    'NOT_ASSIGNED'  AS department_id,\n    'NOT_ASSIGNED'  AS department_number,\n    'Not Assigned'  AS department_name,\n\n    \n        'UNKNOWN' AS cust_department_manager,\n    \n\n    'NOT_ASSIGNED'  AS rdp_source_system",
+      "refs": [],
+      "columns": {
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "cust_department_manager": {
+          "columnName": "cust_department_manager",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        }
+      }
+    },
+    "model.rtl_rdp.int_styles": {
+      "id": "model.rtl_rdp.int_styles",
+      "name": "int_styles",
+      "fullName": "model.rtl_rdp.int_styles",
+      "nodeType": "model",
+      "materialized": "table",
+      "modelType": "intermediate",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_temp",
+      "path": "models/temp/products/product_hierarchy/int_styles.sql",
+      "description": "",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- int_styles.sql\n-- =============================================================================\n-- Intermediate style model. Reads from stg_styles, joins int_classes to\n-- carry down class and department attributes. Customer columns from stg_styles\n-- pass through dynamically via customer_columns macro.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: rdp_staging.stg_styles\n-- Joins:      int_classes (class_id)\n-- =============================================================================\n\n{% set contract = ['style_id', 'class_id', 'department_id', 'style_number', 'style_name', 'class_number', 'class_name', 'department_number', 'department_name', 'rdp_source_system'] %}\n\nWITH source AS (\n    SELECT * FROM {{ source('rdp_staging', 'stg_styles') }}\n),\n\nclasses AS (\n    SELECT * FROM {{ ref('int_classes') }}\n)\n\nSELECT\n    -- primary key\n    source.style_id,\n\n    -- foreign keys\n    source.class_id,\n    COALESCE(classes.department_id,     'NOT_ASSIGNED')  AS department_id,\n\n    -- attributes\n    source.style_number,\n    source.style_name,\n\n    -- carried down from int_classes\n    COALESCE(classes.class_number,      'NOT_ASSIGNED')  AS class_number,\n    COALESCE(classes.class_name,        'NOT ASSIGNED')  AS class_name,\n    COALESCE(classes.department_number, 'NOT_ASSIGNED')  AS department_number,\n    COALESCE(classes.department_name,   'NOT ASSIGNED')  AS department_name,\n\n    -- customer columns passthrough\n    {% if has_customer_columns(source('rdp_staging', 'stg_styles'), contract) %}\n        {{ customer_columns(source('rdp_staging', 'stg_styles'), contract) }},\n    {% endif %}\n\n    -- system columns\n    source.rdp_source_system\n\nFROM source\nLEFT JOIN classes\n    ON source.class_id = classes.class_id\n\nUNION ALL\n\nSELECT\n    'NOT_ASSIGNED'  AS style_id,\n    'NOT_ASSIGNED'  AS class_id,\n    'NOT_ASSIGNED'  AS department_id,\n    'NOT_ASSIGNED'  AS style_number,\n    'Not Assigned'  AS style_name,\n    'NOT_ASSIGNED'  AS class_number,\n    'Not Assigned'  AS class_name,\n    'NOT_ASSIGNED'  AS department_number,\n    'Not Assigned'  AS department_name,\n\n    {% if has_customer_columns(source('rdp_staging', 'stg_styles'), contract) %}\n        {{ sentinel_customer_columns(source('rdp_staging', 'stg_styles'), contract) }},\n    {% endif %}\n\n    'NOT_ASSIGNED'  AS rdp_source_system",
+      "compiledCode": "-- =============================================================================\n-- int_styles.sql\n-- =============================================================================\n-- Intermediate style model. Reads from stg_styles, joins int_classes to\n-- carry down class and department attributes. Customer columns from stg_styles\n-- pass through dynamically via customer_columns macro.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: rdp_staging.stg_styles\n-- Joins:      int_classes (class_id)\n-- =============================================================================\n\n\n\nWITH source AS (\n    SELECT * FROM `crested-sentry-489814-b6`.`dev_rdp_staging`.`stg_styles`\n),\n\nclasses AS (\n    SELECT * FROM `crested-sentry-489814-b6`.`dev_rdp_temp`.`int_classes`\n)\n\nSELECT\n    -- primary key\n    source.style_id,\n\n    -- foreign keys\n    source.class_id,\n    COALESCE(classes.department_id,     'NOT_ASSIGNED')  AS department_id,\n\n    -- attributes\n    source.style_number,\n    source.style_name,\n\n    -- carried down from int_classes\n    COALESCE(classes.class_number,      'NOT_ASSIGNED')  AS class_number,\n    COALESCE(classes.class_name,        'NOT ASSIGNED')  AS class_name,\n    COALESCE(classes.department_number, 'NOT_ASSIGNED')  AS department_number,\n    COALESCE(classes.department_name,   'NOT ASSIGNED')  AS department_name,\n\n    -- customer columns passthrough\n    \n\n    -- system columns\n    source.rdp_source_system\n\nFROM source\nLEFT JOIN classes\n    ON source.class_id = classes.class_id\n\nUNION ALL\n\nSELECT\n    'NOT_ASSIGNED'  AS style_id,\n    'NOT_ASSIGNED'  AS class_id,\n    'NOT_ASSIGNED'  AS department_id,\n    'NOT_ASSIGNED'  AS style_number,\n    'Not Assigned'  AS style_name,\n    'NOT_ASSIGNED'  AS class_number,\n    'Not Assigned'  AS class_name,\n    'NOT_ASSIGNED'  AS department_number,\n    'Not Assigned'  AS department_name,\n\n    \n\n    'NOT_ASSIGNED'  AS rdp_source_system",
+      "refs": [
+        {
+          "name": "int_classes",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "style_id": {
+          "columnName": "style_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "style_number": {
+          "columnName": "style_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "style_name": {
+          "columnName": "style_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "class_number": {
+          "columnName": "class_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "class_name": {
+          "columnName": "class_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        }
+      }
+    },
+    "model.rtl_rdp.int_classes": {
+      "id": "model.rtl_rdp.int_classes",
+      "name": "int_classes",
+      "fullName": "model.rtl_rdp.int_classes",
+      "nodeType": "model",
+      "materialized": "table",
+      "modelType": "intermediate",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_temp",
+      "path": "models/temp/products/product_hierarchy/int_classes.sql",
+      "description": "",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- int_classes.sql\n-- =============================================================================\n-- Intermediate class model. Reads from stg_classes, joins int_departments to\n-- carry down department attributes. Customer columns from stg_classes pass\n-- through dynamically via customer_columns macro.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: rdp_staging.stg_classes\n-- Joins:      int_departments (department_id)\n-- =============================================================================\n\n{% set contract = ['class_id', 'department_id', 'class_number', 'class_name', 'department_number', 'department_name', 'rdp_source_system'] %}\n\nWITH source AS (\n    SELECT * FROM {{ source('rdp_staging', 'stg_classes') }}\n),\n\ndepartments AS (\n    SELECT * FROM {{ ref('int_departments') }}\n)\n\nSELECT\n    -- primary key\n    source.class_id,\n\n    -- foreign key\n    source.department_id,\n\n    -- attributes\n    source.class_number,\n    source.class_name,\n\n    -- carried down from int_departments\n    COALESCE(departments.department_number, 'NOT_ASSIGNED')  AS department_number,\n    COALESCE(departments.department_name,   'NOT ASSIGNED')  AS department_name,\n\n    -- customer columns passthrough\n    {% if has_customer_columns(source('rdp_staging', 'stg_classes'), contract) %}\n        {{ customer_columns(source('rdp_staging', 'stg_classes'), contract) }},\n    {% endif %}\n\n    -- system columns\n    source.rdp_source_system\n\nFROM source\nLEFT JOIN departments\n    ON source.department_id = departments.department_id\n\nUNION ALL\n\nSELECT\n    'NOT_ASSIGNED'  AS class_id,\n    'NOT_ASSIGNED'  AS department_id,\n    'NOT_ASSIGNED'  AS class_number,\n    'Not Assigned'  AS class_name,\n    'NOT_ASSIGNED'  AS department_number,\n    'Not Assigned'  AS department_name,\n\n    {% if has_customer_columns(source('rdp_staging', 'stg_classes'), contract) %}\n        {{ sentinel_customer_columns(source('rdp_staging', 'stg_classes'), contract) }},\n    {% endif %}\n\n    'NOT_ASSIGNED'  AS rdp_source_system",
+      "compiledCode": "-- =============================================================================\n-- int_classes.sql\n-- =============================================================================\n-- Intermediate class model. Reads from stg_classes, joins int_departments to\n-- carry down department attributes. Customer columns from stg_classes pass\n-- through dynamically via customer_columns macro.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: rdp_staging.stg_classes\n-- Joins:      int_departments (department_id)\n-- =============================================================================\n\n\n\nWITH source AS (\n    SELECT * FROM `crested-sentry-489814-b6`.`dev_rdp_staging`.`stg_classes`\n),\n\ndepartments AS (\n    SELECT * FROM `crested-sentry-489814-b6`.`dev_rdp_temp`.`int_departments`\n)\n\nSELECT\n    -- primary key\n    source.class_id,\n\n    -- foreign key\n    source.department_id,\n\n    -- attributes\n    source.class_number,\n    source.class_name,\n\n    -- carried down from int_departments\n    COALESCE(departments.department_number, 'NOT_ASSIGNED')  AS department_number,\n    COALESCE(departments.department_name,   'NOT ASSIGNED')  AS department_name,\n\n    -- customer columns passthrough\n    \n\n    -- system columns\n    source.rdp_source_system\n\nFROM source\nLEFT JOIN departments\n    ON source.department_id = departments.department_id\n\nUNION ALL\n\nSELECT\n    'NOT_ASSIGNED'  AS class_id,\n    'NOT_ASSIGNED'  AS department_id,\n    'NOT_ASSIGNED'  AS class_number,\n    'Not Assigned'  AS class_name,\n    'NOT_ASSIGNED'  AS department_number,\n    'Not Assigned'  AS department_name,\n\n    \n\n    'NOT_ASSIGNED'  AS rdp_source_system",
+      "refs": [
+        {
+          "name": "int_departments",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "class_number": {
+          "columnName": "class_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "class_name": {
+          "columnName": "class_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        }
+      }
+    },
+    "model.rtl_rdp.int_items": {
+      "id": "model.rtl_rdp.int_items",
+      "name": "int_items",
+      "fullName": "model.rtl_rdp.int_items",
+      "nodeType": "model",
+      "materialized": "table",
+      "modelType": "intermediate",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_temp",
+      "path": "models/temp/products/product_hierarchy/int_items.sql",
+      "description": "",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- int_items.sql\n-- =============================================================================\n-- Intermediate item model. Reads from stg_items, joins int_styles to carry\n-- down style, class, and department attributes. Customer columns from stg_items\n-- pass through dynamically via customer_columns macro.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: rdp_staging.stg_items\n-- Joins:      int_styles (style_id)\n-- =============================================================================\n\n{% set contract = ['item_id', 'style_id', 'class_id', 'department_id', 'item_number', 'item_name', 'style_number', 'style_name', 'class_number', 'class_name', 'department_number', 'department_name', 'rdp_source_system'] %}\n\nWITH source AS (\n    SELECT * FROM {{ source('rdp_staging', 'stg_items') }}\n),\n\nstyles AS (\n    SELECT * FROM {{ ref('int_styles') }}\n)\n\nSELECT\n    -- primary key\n    source.item_id,\n\n    -- foreign keys\n    source.style_id,\n    COALESCE(styles.class_id,          'NOT_ASSIGNED')  AS class_id,\n    COALESCE(styles.department_id,     'NOT_ASSIGNED')  AS department_id,\n\n    -- attributes\n    source.item_number,\n    source.item_name,\n\n    -- carried down from int_styles\n    COALESCE(styles.style_number,      'NOT_ASSIGNED')  AS style_number,\n    COALESCE(styles.style_name,        'NOT ASSIGNED')  AS style_name,\n    COALESCE(styles.class_number,      'NOT_ASSIGNED')  AS class_number,\n    COALESCE(styles.class_name,        'NOT ASSIGNED')  AS class_name,\n    COALESCE(styles.department_number, 'NOT_ASSIGNED')  AS department_number,\n    COALESCE(styles.department_name,   'NOT ASSIGNED')  AS department_name,\n\n    -- customer columns passthrough\n    {% if has_customer_columns(source('rdp_staging', 'stg_items'), contract) %}\n        {{ customer_columns(source('rdp_staging', 'stg_items'), contract) }},\n    {% endif %}\n\n    -- system columns\n    source.rdp_source_system\n\nFROM source\nLEFT JOIN styles\n    ON source.style_id = styles.style_id\n\nUNION ALL\n\nSELECT\n    'NOT_ASSIGNED'  AS item_id,\n    'NOT_ASSIGNED'  AS style_id,\n    'NOT_ASSIGNED'  AS class_id,\n    'NOT_ASSIGNED'  AS department_id,\n    'NOT_ASSIGNED'  AS item_number,\n    'Not Assigned'  AS item_name,\n    'NOT_ASSIGNED'  AS style_number,\n    'Not Assigned'  AS style_name,\n    'NOT_ASSIGNED'  AS class_number,\n    'Not Assigned'  AS class_name,\n    'NOT_ASSIGNED'  AS department_number,\n    'Not Assigned'  AS department_name,\n\n    {% if has_customer_columns(source('rdp_staging', 'stg_items'), contract) %}\n        {{ sentinel_customer_columns(source('rdp_staging', 'stg_items'), contract) }},\n    {% endif %}\n\n    'NOT_ASSIGNED'  AS rdp_source_system",
+      "compiledCode": "-- =============================================================================\n-- int_items.sql\n-- =============================================================================\n-- Intermediate item model. Reads from stg_items, joins int_styles to carry\n-- down style, class, and department attributes. Customer columns from stg_items\n-- pass through dynamically via customer_columns macro.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: rdp_staging.stg_items\n-- Joins:      int_styles (style_id)\n-- =============================================================================\n\n\n\nWITH source AS (\n    SELECT * FROM `crested-sentry-489814-b6`.`dev_rdp_staging`.`stg_items`\n),\n\nstyles AS (\n    SELECT * FROM `crested-sentry-489814-b6`.`dev_rdp_temp`.`int_styles`\n)\n\nSELECT\n    -- primary key\n    source.item_id,\n\n    -- foreign keys\n    source.style_id,\n    COALESCE(styles.class_id,          'NOT_ASSIGNED')  AS class_id,\n    COALESCE(styles.department_id,     'NOT_ASSIGNED')  AS department_id,\n\n    -- attributes\n    source.item_number,\n    source.item_name,\n\n    -- carried down from int_styles\n    COALESCE(styles.style_number,      'NOT_ASSIGNED')  AS style_number,\n    COALESCE(styles.style_name,        'NOT ASSIGNED')  AS style_name,\n    COALESCE(styles.class_number,      'NOT_ASSIGNED')  AS class_number,\n    COALESCE(styles.class_name,        'NOT ASSIGNED')  AS class_name,\n    COALESCE(styles.department_number, 'NOT_ASSIGNED')  AS department_number,\n    COALESCE(styles.department_name,   'NOT ASSIGNED')  AS department_name,\n\n    -- customer columns passthrough\n    \n\n    -- system columns\n    source.rdp_source_system\n\nFROM source\nLEFT JOIN styles\n    ON source.style_id = styles.style_id\n\nUNION ALL\n\nSELECT\n    'NOT_ASSIGNED'  AS item_id,\n    'NOT_ASSIGNED'  AS style_id,\n    'NOT_ASSIGNED'  AS class_id,\n    'NOT_ASSIGNED'  AS department_id,\n    'NOT_ASSIGNED'  AS item_number,\n    'Not Assigned'  AS item_name,\n    'NOT_ASSIGNED'  AS style_number,\n    'Not Assigned'  AS style_name,\n    'NOT_ASSIGNED'  AS class_number,\n    'Not Assigned'  AS class_name,\n    'NOT_ASSIGNED'  AS department_number,\n    'Not Assigned'  AS department_name,\n\n    \n\n    'NOT_ASSIGNED'  AS rdp_source_system",
+      "refs": [
+        {
+          "name": "int_styles",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "item_id": {
+          "columnName": "item_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "style_id": {
+          "columnName": "style_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "item_number": {
+          "columnName": "item_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "item_name": {
+          "columnName": "item_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "style_number": {
+          "columnName": "style_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "style_name": {
+          "columnName": "style_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "class_number": {
+          "columnName": "class_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "class_name": {
+          "columnName": "class_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "transformation"
+        }
+      }
+    },
+    "model.rtl_rdp.dim_departments": {
+      "id": "model.rtl_rdp.dim_departments",
+      "name": "dim_departments",
+      "fullName": "model.rtl_rdp.dim_departments",
+      "nodeType": "model",
+      "materialized": "table",
+      "modelType": "dimension",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_dwh",
+      "path": "models/dwh/products/product_hierarchy/dim_departments.sql",
+      "description": "A department is the broadest grouping in the product hierarchy. Used to analyze and report merchandise performance at the highest level of the product classification structure.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- dim_departments.sql\n-- =============================================================================\n-- Dimension table for departments. Reads from int_departments, which already\n-- includes the NOT_ASSIGNED sentinel row and customer column passthrough.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: int_departments\n-- =============================================================================\n\nSELECT\n    *,\n    {{ audit_columns() }}\n\nFROM {{ ref('int_departments') }}",
+      "compiledCode": "-- =============================================================================\n-- dim_departments.sql\n-- =============================================================================\n-- Dimension table for departments. Reads from int_departments, which already\n-- includes the NOT_ASSIGNED sentinel row and customer column passthrough.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: int_departments\n-- =============================================================================\n\nSELECT\n    *,\n    \n    CURRENT_TIMESTAMP()             AS rdp_created_at,\n    CURRENT_TIMESTAMP()             AS rdp_updated_at\n\n\nFROM `crested-sentry-489814-b6`.`dev_rdp_temp`.`int_departments`",
+      "refs": [
+        {
+          "name": "int_departments",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a department. Primary key of the\ndepartment entity. Used as a foreign key in all tables that reference\ndepartments. May be a system-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a department. Used in reports and\nuser interfaces. May differ from department_id which is an internal\nsystem identifier.",
+          "lineageType": "pass-through"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the department. Used as a label in reports and\nuser interfaces.",
+          "lineageType": "pass-through"
+        },
+        "cust_department_manager": {
+          "columnName": "cust_department_manager",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "pass-through"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided the record. Supplied by the\ncustomer in the staging layer and flows through unchanged to all downstream\ntables. Used for data lineage and multi-source reconciliation.",
+          "lineageType": "pass-through"
+        },
+        "rdp_created_at": {
+          "columnName": "rdp_created_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that first materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record creation time, until incremental materialization is adopted.",
+          "lineageType": "unknown"
+        },
+        "rdp_updated_at": {
+          "columnName": "rdp_updated_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that last materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record update time, until incremental materialization is adopted.",
+          "lineageType": "unknown"
+        }
+      }
+    },
+    "model.rtl_rdp.dim_classes": {
+      "id": "model.rtl_rdp.dim_classes",
+      "name": "dim_classes",
+      "fullName": "model.rtl_rdp.dim_classes",
+      "nodeType": "model",
+      "materialized": "table",
+      "modelType": "dimension",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_dwh",
+      "path": "models/dwh/products/product_hierarchy/dim_classes.sql",
+      "description": "A class is a grouping of styles within a department. Used to analyze and report merchandise performance at the class level across all styles and items within it.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- dim_classes.sql\n-- =============================================================================\n-- Dimension table for classes. Reads from int_classes, which already includes\n-- the NOT_ASSIGNED sentinel row, department attribute carry-down, and customer\n-- column passthrough.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: int_classes\n-- =============================================================================\n\nSELECT\n    *,\n    {{ audit_columns() }}\n\nFROM {{ ref('int_classes') }}",
+      "compiledCode": "-- =============================================================================\n-- dim_classes.sql\n-- =============================================================================\n-- Dimension table for classes. Reads from int_classes, which already includes\n-- the NOT_ASSIGNED sentinel row, department attribute carry-down, and customer\n-- column passthrough.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: int_classes\n-- =============================================================================\n\nSELECT\n    *,\n    \n    CURRENT_TIMESTAMP()             AS rdp_created_at,\n    CURRENT_TIMESTAMP()             AS rdp_updated_at\n\n\nFROM `crested-sentry-489814-b6`.`dev_rdp_temp`.`int_classes`",
+      "refs": [
+        {
+          "name": "int_classes",
+          "package": null,
+          "version": null
+        },
+        {
+          "name": "dim_departments",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a class. Primary key of the class entity.\nUsed as a foreign key in all tables that reference classes. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a department. Primary key of the\ndepartment entity. Used as a foreign key in all tables that reference\ndepartments. May be a system-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "class_number": {
+          "columnName": "class_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a class. Used in reports and user\ninterfaces. May differ from class_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "class_name": {
+          "columnName": "class_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the class. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a department. Used in reports and\nuser interfaces. May differ from department_id which is an internal\nsystem identifier.",
+          "lineageType": "pass-through"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the department. Used as a label in reports and\nuser interfaces.",
+          "lineageType": "pass-through"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided the record. Supplied by the\ncustomer in the staging layer and flows through unchanged to all downstream\ntables. Used for data lineage and multi-source reconciliation.",
+          "lineageType": "pass-through"
+        },
+        "rdp_created_at": {
+          "columnName": "rdp_created_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that first materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record creation time, until incremental materialization is adopted.",
+          "lineageType": "unknown"
+        },
+        "rdp_updated_at": {
+          "columnName": "rdp_updated_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that last materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record update time, until incremental materialization is adopted.",
+          "lineageType": "unknown"
+        }
+      }
+    },
+    "model.rtl_rdp.dim_styles": {
+      "id": "model.rtl_rdp.dim_styles",
+      "name": "dim_styles",
+      "fullName": "model.rtl_rdp.dim_styles",
+      "nodeType": "model",
+      "materialized": "table",
+      "modelType": "dimension",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_dwh",
+      "path": "models/dwh/products/product_hierarchy/dim_styles.sql",
+      "description": "A style is a grouping of items within a class. Used to analyze and report merchandise performance at the style level across all items within it.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- dim_styles.sql\n-- =============================================================================\n-- Dimension table for styles. Reads from int_styles, which already includes\n-- the NOT_ASSIGNED sentinel row, class and department attribute carry-down,\n-- and customer column passthrough.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: int_styles\n-- =============================================================================\n\nSELECT\n    *,\n    {{ audit_columns() }}\n\nFROM {{ ref('int_styles') }}",
+      "compiledCode": "-- =============================================================================\n-- dim_styles.sql\n-- =============================================================================\n-- Dimension table for styles. Reads from int_styles, which already includes\n-- the NOT_ASSIGNED sentinel row, class and department attribute carry-down,\n-- and customer column passthrough.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: int_styles\n-- =============================================================================\n\nSELECT\n    *,\n    \n    CURRENT_TIMESTAMP()             AS rdp_created_at,\n    CURRENT_TIMESTAMP()             AS rdp_updated_at\n\n\nFROM `crested-sentry-489814-b6`.`dev_rdp_temp`.`int_styles`",
+      "refs": [
+        {
+          "name": "int_styles",
+          "package": null,
+          "version": null
+        },
+        {
+          "name": "dim_classes",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "style_id": {
+          "columnName": "style_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a style. Primary key of the style entity.\nUsed as a foreign key in all tables that reference styles. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a class. Primary key of the class entity.\nUsed as a foreign key in all tables that reference classes. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a department. Primary key of the\ndepartment entity. Used as a foreign key in all tables that reference\ndepartments. May be a system-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "style_number": {
+          "columnName": "style_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a style. Used in reports and user\ninterfaces. May differ from style_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "style_name": {
+          "columnName": "style_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the style. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "class_number": {
+          "columnName": "class_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a class. Used in reports and user\ninterfaces. May differ from class_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "class_name": {
+          "columnName": "class_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the class. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a department. Used in reports and\nuser interfaces. May differ from department_id which is an internal\nsystem identifier.",
+          "lineageType": "pass-through"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the department. Used as a label in reports and\nuser interfaces.",
+          "lineageType": "pass-through"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided the record. Supplied by the\ncustomer in the staging layer and flows through unchanged to all downstream\ntables. Used for data lineage and multi-source reconciliation.",
+          "lineageType": "pass-through"
+        },
+        "rdp_created_at": {
+          "columnName": "rdp_created_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that first materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record creation time, until incremental materialization is adopted.",
+          "lineageType": "unknown"
+        },
+        "rdp_updated_at": {
+          "columnName": "rdp_updated_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that last materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record update time, until incremental materialization is adopted.",
+          "lineageType": "unknown"
+        }
+      }
+    },
+    "model.rtl_rdp.dim_items": {
+      "id": "model.rtl_rdp.dim_items",
+      "name": "dim_items",
+      "fullName": "model.rtl_rdp.dim_items",
+      "nodeType": "model",
+      "materialized": "table",
+      "modelType": "dimension",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_dwh",
+      "path": "models/dwh/products/product_hierarchy/dim_items.sql",
+      "description": "An item is the lowest level of the product hierarchy and the primary unit of merchandise. All transactional data such as sales, inventory and orders is recorded at the item level.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- dim_items.sql\n-- =============================================================================\n-- Dimension table for items. Reads from int_items, which already includes\n-- the NOT_ASSIGNED sentinel row, style, class, and department attribute\n-- carry-down, and customer column passthrough.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: int_items\n-- =============================================================================\n\nSELECT\n    *,\n    {{ audit_columns() }}\n\nFROM {{ ref('int_items') }}",
+      "compiledCode": "-- =============================================================================\n-- dim_items.sql\n-- =============================================================================\n-- Dimension table for items. Reads from int_items, which already includes\n-- the NOT_ASSIGNED sentinel row, style, class, and department attribute\n-- carry-down, and customer column passthrough.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: int_items\n-- =============================================================================\n\nSELECT\n    *,\n    \n    CURRENT_TIMESTAMP()             AS rdp_created_at,\n    CURRENT_TIMESTAMP()             AS rdp_updated_at\n\n\nFROM `crested-sentry-489814-b6`.`dev_rdp_temp`.`int_items`",
+      "refs": [
+        {
+          "name": "int_items",
+          "package": null,
+          "version": null
+        },
+        {
+          "name": "dim_styles",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "item_id": {
+          "columnName": "item_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for an item. Primary key of the item entity.\nUsed as a foreign key in all tables that reference items. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "style_id": {
+          "columnName": "style_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a style. Primary key of the style entity.\nUsed as a foreign key in all tables that reference styles. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a class. Primary key of the class entity.\nUsed as a foreign key in all tables that reference classes. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a department. Primary key of the\ndepartment entity. Used as a foreign key in all tables that reference\ndepartments. May be a system-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "item_number": {
+          "columnName": "item_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for an item. Used in reports and user\ninterfaces. May differ from item_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "item_name": {
+          "columnName": "item_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the item. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "style_number": {
+          "columnName": "style_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a style. Used in reports and user\ninterfaces. May differ from style_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "style_name": {
+          "columnName": "style_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the style. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "class_number": {
+          "columnName": "class_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a class. Used in reports and user\ninterfaces. May differ from class_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "class_name": {
+          "columnName": "class_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the class. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a department. Used in reports and\nuser interfaces. May differ from department_id which is an internal\nsystem identifier.",
+          "lineageType": "pass-through"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the department. Used as a label in reports and\nuser interfaces.",
+          "lineageType": "pass-through"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided the record. Supplied by the\ncustomer in the staging layer and flows through unchanged to all downstream\ntables. Used for data lineage and multi-source reconciliation.",
+          "lineageType": "pass-through"
+        },
+        "rdp_created_at": {
+          "columnName": "rdp_created_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that first materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record creation time, until incremental materialization is adopted.",
+          "lineageType": "unknown"
+        },
+        "rdp_updated_at": {
+          "columnName": "rdp_updated_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that last materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record update time, until incremental materialization is adopted.",
+          "lineageType": "unknown"
+        }
+      }
+    },
+    "model.rtl_rdp.vw_dim_departments": {
+      "id": "model.rtl_rdp.vw_dim_departments",
+      "name": "vw_dim_departments",
+      "fullName": "model.rtl_rdp.vw_dim_departments",
+      "nodeType": "model",
+      "materialized": "view",
+      "modelType": "unknown",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_dwh_views",
+      "path": "models/dwh_views/products/product_hierarchy/vw_dim_departments.sql",
+      "description": "Stable public-facing view over dim_departments. Provides a consistent interface to the physical dimension table, absorbing any breaking schema changes before they reach downstream consumers.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- vw_dim_departments.sql\n-- =============================================================================\n-- Stable public-facing view over dim_departments. Provides a consistent\n-- interface to the physical dimension table, absorbing any breaking schema\n-- changes before they reach downstream consumers.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: dim_departments\n-- =============================================================================\n\nSELECT *\n\nFROM {{ ref('dim_departments') }}",
+      "compiledCode": "-- =============================================================================\n-- vw_dim_departments.sql\n-- =============================================================================\n-- Stable public-facing view over dim_departments. Provides a consistent\n-- interface to the physical dimension table, absorbing any breaking schema\n-- changes before they reach downstream consumers.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: dim_departments\n-- =============================================================================\n\nSELECT *\n\nFROM `crested-sentry-489814-b6`.`dev_rdp_dwh`.`dim_departments`",
+      "refs": [
+        {
+          "name": "dim_departments",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a department. Primary key of the\ndepartment entity. Used as a foreign key in all tables that reference\ndepartments. May be a system-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a department. Used in reports and\nuser interfaces. May differ from department_id which is an internal\nsystem identifier.",
+          "lineageType": "pass-through"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the department. Used as a label in reports and\nuser interfaces.",
+          "lineageType": "pass-through"
+        },
+        "cust_department_manager": {
+          "columnName": "cust_department_manager",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "lineageType": "pass-through"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided the record. Supplied by the\ncustomer in the staging layer and flows through unchanged to all downstream\ntables. Used for data lineage and multi-source reconciliation.",
+          "lineageType": "pass-through"
+        },
+        "rdp_created_at": {
+          "columnName": "rdp_created_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that first materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record creation time, until incremental materialization is adopted.",
+          "lineageType": "pass-through"
+        },
+        "rdp_updated_at": {
+          "columnName": "rdp_updated_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that last materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record update time, until incremental materialization is adopted.",
+          "lineageType": "pass-through"
+        }
+      }
+    },
+    "model.rtl_rdp.vw_dim_classes": {
+      "id": "model.rtl_rdp.vw_dim_classes",
+      "name": "vw_dim_classes",
+      "fullName": "model.rtl_rdp.vw_dim_classes",
+      "nodeType": "model",
+      "materialized": "view",
+      "modelType": "unknown",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_dwh_views",
+      "path": "models/dwh_views/products/product_hierarchy/vw_dim_classes.sql",
+      "description": "Stable public-facing view over dim_classes. Provides a consistent interface to the physical dimension table, absorbing any breaking schema changes before they reach downstream consumers.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- vw_dim_classes.sql\n-- =============================================================================\n-- Stable public-facing view over dim_classes. Provides a consistent\n-- interface to the physical dimension table, absorbing any breaking schema\n-- changes before they reach downstream consumers.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: dim_classes\n-- =============================================================================\n\nSELECT *\n\nFROM {{ ref('dim_classes') }}",
+      "compiledCode": "-- =============================================================================\n-- vw_dim_classes.sql\n-- =============================================================================\n-- Stable public-facing view over dim_classes. Provides a consistent\n-- interface to the physical dimension table, absorbing any breaking schema\n-- changes before they reach downstream consumers.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: dim_classes\n-- =============================================================================\n\nSELECT *\n\nFROM `crested-sentry-489814-b6`.`dev_rdp_dwh`.`dim_classes`",
+      "refs": [
+        {
+          "name": "dim_classes",
+          "package": null,
+          "version": null
+        },
+        {
+          "name": "vw_dim_departments",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a class. Primary key of the class entity.\nUsed as a foreign key in all tables that reference classes. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a department. Primary key of the\ndepartment entity. Used as a foreign key in all tables that reference\ndepartments. May be a system-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "class_number": {
+          "columnName": "class_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a class. Used in reports and user\ninterfaces. May differ from class_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "class_name": {
+          "columnName": "class_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the class. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a department. Used in reports and\nuser interfaces. May differ from department_id which is an internal\nsystem identifier.",
+          "lineageType": "pass-through"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the department. Used as a label in reports and\nuser interfaces.",
+          "lineageType": "pass-through"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided the record. Supplied by the\ncustomer in the staging layer and flows through unchanged to all downstream\ntables. Used for data lineage and multi-source reconciliation.",
+          "lineageType": "pass-through"
+        },
+        "rdp_created_at": {
+          "columnName": "rdp_created_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that first materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record creation time, until incremental materialization is adopted.",
+          "lineageType": "pass-through"
+        },
+        "rdp_updated_at": {
+          "columnName": "rdp_updated_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that last materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record update time, until incremental materialization is adopted.",
+          "lineageType": "pass-through"
+        }
+      }
+    },
+    "model.rtl_rdp.vw_dim_styles": {
+      "id": "model.rtl_rdp.vw_dim_styles",
+      "name": "vw_dim_styles",
+      "fullName": "model.rtl_rdp.vw_dim_styles",
+      "nodeType": "model",
+      "materialized": "view",
+      "modelType": "unknown",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_dwh_views",
+      "path": "models/dwh_views/products/product_hierarchy/vw_dim_styles.sql",
+      "description": "Stable public-facing view over dim_styles. Provides a consistent interface to the physical dimension table, absorbing any breaking schema changes before they reach downstream consumers.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- vw_dim_styles.sql\n-- =============================================================================\n-- Stable public-facing view over dim_styles. Provides a consistent\n-- interface to the physical dimension table, absorbing any breaking schema\n-- changes before they reach downstream consumers.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: dim_styles\n-- =============================================================================\n\nSELECT *\n\nFROM {{ ref('dim_styles') }}",
+      "compiledCode": "-- =============================================================================\n-- vw_dim_styles.sql\n-- =============================================================================\n-- Stable public-facing view over dim_styles. Provides a consistent\n-- interface to the physical dimension table, absorbing any breaking schema\n-- changes before they reach downstream consumers.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: dim_styles\n-- =============================================================================\n\nSELECT *\n\nFROM `crested-sentry-489814-b6`.`dev_rdp_dwh`.`dim_styles`",
+      "refs": [
+        {
+          "name": "dim_styles",
+          "package": null,
+          "version": null
+        },
+        {
+          "name": "vw_dim_classes",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "style_id": {
+          "columnName": "style_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a style. Primary key of the style entity.\nUsed as a foreign key in all tables that reference styles. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a class. Primary key of the class entity.\nUsed as a foreign key in all tables that reference classes. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a department. Primary key of the\ndepartment entity. Used as a foreign key in all tables that reference\ndepartments. May be a system-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "style_number": {
+          "columnName": "style_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a style. Used in reports and user\ninterfaces. May differ from style_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "style_name": {
+          "columnName": "style_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the style. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "class_number": {
+          "columnName": "class_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a class. Used in reports and user\ninterfaces. May differ from class_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "class_name": {
+          "columnName": "class_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the class. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a department. Used in reports and\nuser interfaces. May differ from department_id which is an internal\nsystem identifier.",
+          "lineageType": "pass-through"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the department. Used as a label in reports and\nuser interfaces.",
+          "lineageType": "pass-through"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided the record. Supplied by the\ncustomer in the staging layer and flows through unchanged to all downstream\ntables. Used for data lineage and multi-source reconciliation.",
+          "lineageType": "pass-through"
+        },
+        "rdp_created_at": {
+          "columnName": "rdp_created_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that first materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record creation time, until incremental materialization is adopted.",
+          "lineageType": "pass-through"
+        },
+        "rdp_updated_at": {
+          "columnName": "rdp_updated_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that last materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record update time, until incremental materialization is adopted.",
+          "lineageType": "pass-through"
+        }
+      }
+    },
+    "model.rtl_rdp.vw_dim_items": {
+      "id": "model.rtl_rdp.vw_dim_items",
+      "name": "vw_dim_items",
+      "fullName": "model.rtl_rdp.vw_dim_items",
+      "nodeType": "model",
+      "materialized": "view",
+      "modelType": "unknown",
+      "database": "crested-sentry-489814-b6",
+      "schema": "dev_rdp_dwh_views",
+      "path": "models/dwh_views/products/product_hierarchy/vw_dim_items.sql",
+      "description": "Stable public-facing view over dim_items. Provides a consistent interface to the physical dimension table, absorbing any breaking schema changes before they reach downstream consumers.\n",
+      "contractEnforced": false,
+      "rawCode": "-- =============================================================================\n-- vw_dim_items.sql\n-- =============================================================================\n-- Stable public-facing view over dim_items. Provides a consistent\n-- interface to the physical dimension table, absorbing any breaking schema\n-- changes before they reach downstream consumers.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: dim_items\n-- =============================================================================\n\nSELECT *\n\nFROM {{ ref('dim_items') }}",
+      "compiledCode": "-- =============================================================================\n-- vw_dim_items.sql\n-- =============================================================================\n-- Stable public-facing view over dim_items. Provides a consistent\n-- interface to the physical dimension table, absorbing any breaking schema\n-- changes before they reach downstream consumers.\n--\n-- Component:  Product Hierarchy\n-- Owner:      RDP Product Team\n-- Reads from: dim_items\n-- =============================================================================\n\nSELECT *\n\nFROM `crested-sentry-489814-b6`.`dev_rdp_dwh`.`dim_items`",
+      "refs": [
+        {
+          "name": "dim_items",
+          "package": null,
+          "version": null
+        },
+        {
+          "name": "vw_dim_styles",
+          "package": null,
+          "version": null
+        }
+      ],
+      "columns": {
+        "item_id": {
+          "columnName": "item_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for an item. Primary key of the item entity.\nUsed as a foreign key in all tables that reference items. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "style_id": {
+          "columnName": "style_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a style. Primary key of the style entity.\nUsed as a foreign key in all tables that reference styles. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "class_id": {
+          "columnName": "class_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a class. Primary key of the class entity.\nUsed as a foreign key in all tables that reference classes. May be a\nsystem-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "department_id": {
+          "columnName": "department_id",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Unique internal identifier for a department. Primary key of the\ndepartment entity. Used as a foreign key in all tables that reference\ndepartments. May be a system-generated value not intended for display.",
+          "lineageType": "pass-through"
+        },
+        "item_number": {
+          "columnName": "item_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for an item. Used in reports and user\ninterfaces. May differ from item_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "item_name": {
+          "columnName": "item_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the item. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "style_number": {
+          "columnName": "style_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a style. Used in reports and user\ninterfaces. May differ from style_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "style_name": {
+          "columnName": "style_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the style. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "class_number": {
+          "columnName": "class_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a class. Used in reports and user\ninterfaces. May differ from class_id which is an internal system\nidentifier.",
+          "lineageType": "pass-through"
+        },
+        "class_name": {
+          "columnName": "class_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the class. Used as a label in reports and user\ninterfaces.",
+          "lineageType": "pass-through"
+        },
+        "department_number": {
+          "columnName": "department_number",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Human-readable display number for a department. Used in reports and\nuser interfaces. May differ from department_id which is an internal\nsystem identifier.",
+          "lineageType": "pass-through"
+        },
+        "department_name": {
+          "columnName": "department_name",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Descriptive name of the department. Used as a label in reports and\nuser interfaces.",
+          "lineageType": "pass-through"
+        },
+        "rdp_source_system": {
+          "columnName": "rdp_source_system",
+          "hasLineage": true,
+          "dataType": "STRING",
+          "description": "Identifies the source system that provided the record. Supplied by the\ncustomer in the staging layer and flows through unchanged to all downstream\ntables. Used for data lineage and multi-source reconciliation.",
+          "lineageType": "pass-through"
+        },
+        "rdp_created_at": {
+          "columnName": "rdp_created_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that first materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record creation time, until incremental materialization is adopted.",
+          "lineageType": "pass-through"
+        },
+        "rdp_updated_at": {
+          "columnName": "rdp_updated_at",
+          "hasLineage": true,
+          "dataType": "TIMESTAMP",
+          "description": "Timestamp of the dbt run that last materialized this record. Set to\nCURRENT_TIMESTAMP() at load time. Reflects full-refresh run time, not\ntrue record update time, until incremental materialization is adopted.",
+          "lineageType": "pass-through"
+        }
+      }
+    }
+  },
+  "lineage": {
+    "edges": [
+      {
+        "id": 1,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_departments",
+        "sourceColumn": "product_category_name",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 2,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_departments",
+        "sourceColumn": "product_category_name",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 3,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_departments",
+        "sourceColumn": "product_category_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 4,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_classes",
+        "sourceColumn": "product_category_name",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 5,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_classes",
+        "sourceColumn": "product_category_name",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 6,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_classes",
+        "sourceColumn": "product_category_name",
+        "targetColumn": "class_number"
+      },
+      {
+        "id": 7,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_classes",
+        "sourceColumn": "product_category_name",
+        "targetColumn": "class_name"
+      },
+      {
+        "id": 8,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_styles",
+        "sourceColumn": "product_id",
+        "targetColumn": "style_id"
+      },
+      {
+        "id": 9,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_styles",
+        "sourceColumn": "product_category_name",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 10,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_styles",
+        "sourceColumn": "product_id",
+        "targetColumn": "style_number"
+      },
+      {
+        "id": 11,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_styles",
+        "sourceColumn": "product_category_name",
+        "targetColumn": "style_name"
+      },
+      {
+        "id": 12,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_items",
+        "sourceColumn": "product_id",
+        "targetColumn": "item_id"
+      },
+      {
+        "id": 13,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_items",
+        "sourceColumn": "product_id",
+        "targetColumn": "style_id"
+      },
+      {
+        "id": 14,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_items",
+        "sourceColumn": "product_id",
+        "targetColumn": "item_number"
+      },
+      {
+        "id": 15,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_items",
+        "sourceColumn": "product_category_name",
+        "targetColumn": "item_name"
+      },
+      {
+        "id": 16,
+        "source": "model.rtl_rdp_client.stg_departments",
+        "target": "model.rtl_rdp.int_departments",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 17,
+        "source": "model.rtl_rdp_client.stg_departments",
+        "target": "model.rtl_rdp.int_departments",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 18,
+        "source": "model.rtl_rdp_client.stg_departments",
+        "target": "model.rtl_rdp.int_departments",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 19,
+        "source": "model.rtl_rdp_client.stg_departments",
+        "target": "model.rtl_rdp.int_departments",
+        "sourceColumn": "cust_department_manager",
+        "targetColumn": "cust_department_manager"
+      },
+      {
+        "id": 20,
+        "source": "model.rtl_rdp_client.stg_departments",
+        "target": "model.rtl_rdp.int_departments",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 21,
+        "source": "model.rtl_rdp_client.stg_styles",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "style_id",
+        "targetColumn": "style_id"
+      },
+      {
+        "id": 22,
+        "source": "model.rtl_rdp_client.stg_styles",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "class_id",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 23,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 24,
+        "source": "model.rtl_rdp_client.stg_styles",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "style_number",
+        "targetColumn": "style_number"
+      },
+      {
+        "id": 25,
+        "source": "model.rtl_rdp_client.stg_styles",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "style_name",
+        "targetColumn": "style_name"
+      },
+      {
+        "id": 26,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "class_number",
+        "targetColumn": "class_number"
+      },
+      {
+        "id": 27,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "class_name",
+        "targetColumn": "class_name"
+      },
+      {
+        "id": 28,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 29,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 30,
+        "source": "model.rtl_rdp_client.stg_styles",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 31,
+        "source": "model.rtl_rdp_client.stg_items",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "item_id",
+        "targetColumn": "item_id"
+      },
+      {
+        "id": 32,
+        "source": "model.rtl_rdp_client.stg_items",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "style_id",
+        "targetColumn": "style_id"
+      },
+      {
+        "id": 33,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "class_id",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 34,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 35,
+        "source": "model.rtl_rdp_client.stg_items",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "item_number",
+        "targetColumn": "item_number"
+      },
+      {
+        "id": 36,
+        "source": "model.rtl_rdp_client.stg_items",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "item_name",
+        "targetColumn": "item_name"
+      },
+      {
+        "id": 37,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "style_number",
+        "targetColumn": "style_number"
+      },
+      {
+        "id": 38,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "style_name",
+        "targetColumn": "style_name"
+      },
+      {
+        "id": 39,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "class_number",
+        "targetColumn": "class_number"
+      },
+      {
+        "id": 40,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "class_name",
+        "targetColumn": "class_name"
+      },
+      {
+        "id": 41,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 42,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 43,
+        "source": "model.rtl_rdp_client.stg_items",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 44,
+        "source": "model.rtl_rdp_client.stg_classes",
+        "target": "model.rtl_rdp.int_classes",
+        "sourceColumn": "class_id",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 45,
+        "source": "model.rtl_rdp_client.stg_classes",
+        "target": "model.rtl_rdp.int_classes",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 46,
+        "source": "model.rtl_rdp_client.stg_classes",
+        "target": "model.rtl_rdp.int_classes",
+        "sourceColumn": "class_number",
+        "targetColumn": "class_number"
+      },
+      {
+        "id": 47,
+        "source": "model.rtl_rdp_client.stg_classes",
+        "target": "model.rtl_rdp.int_classes",
+        "sourceColumn": "class_name",
+        "targetColumn": "class_name"
+      },
+      {
+        "id": 48,
+        "source": "model.rtl_rdp.int_departments",
+        "target": "model.rtl_rdp.int_classes",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 49,
+        "source": "model.rtl_rdp.int_departments",
+        "target": "model.rtl_rdp.int_classes",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 50,
+        "source": "model.rtl_rdp_client.stg_classes",
+        "target": "model.rtl_rdp.int_classes",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 51,
+        "source": "model.rtl_rdp.int_departments",
+        "target": "model.rtl_rdp.dim_departments",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 52,
+        "source": "model.rtl_rdp.int_departments",
+        "target": "model.rtl_rdp.dim_departments",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 53,
+        "source": "model.rtl_rdp.int_departments",
+        "target": "model.rtl_rdp.dim_departments",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 54,
+        "source": "model.rtl_rdp.int_departments",
+        "target": "model.rtl_rdp.dim_departments",
+        "sourceColumn": "cust_department_manager",
+        "targetColumn": "cust_department_manager"
+      },
+      {
+        "id": 55,
+        "source": "model.rtl_rdp.int_departments",
+        "target": "model.rtl_rdp.dim_departments",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 56,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.dim_classes",
+        "sourceColumn": "class_id",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 57,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.dim_classes",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 58,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.dim_classes",
+        "sourceColumn": "class_number",
+        "targetColumn": "class_number"
+      },
+      {
+        "id": 59,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.dim_classes",
+        "sourceColumn": "class_name",
+        "targetColumn": "class_name"
+      },
+      {
+        "id": 60,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.dim_classes",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 61,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.dim_classes",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 62,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.dim_classes",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 63,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "style_id",
+        "targetColumn": "style_id"
+      },
+      {
+        "id": 64,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "class_id",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 65,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 66,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "style_number",
+        "targetColumn": "style_number"
+      },
+      {
+        "id": 67,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "style_name",
+        "targetColumn": "style_name"
+      },
+      {
+        "id": 68,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "class_number",
+        "targetColumn": "class_number"
+      },
+      {
+        "id": 69,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "class_name",
+        "targetColumn": "class_name"
+      },
+      {
+        "id": 70,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 71,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 72,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 73,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "item_id",
+        "targetColumn": "item_id"
+      },
+      {
+        "id": 74,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "style_id",
+        "targetColumn": "style_id"
+      },
+      {
+        "id": 75,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "class_id",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 76,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 77,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "item_number",
+        "targetColumn": "item_number"
+      },
+      {
+        "id": 78,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "item_name",
+        "targetColumn": "item_name"
+      },
+      {
+        "id": 79,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "style_number",
+        "targetColumn": "style_number"
+      },
+      {
+        "id": 80,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "style_name",
+        "targetColumn": "style_name"
+      },
+      {
+        "id": 81,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "class_number",
+        "targetColumn": "class_number"
+      },
+      {
+        "id": 82,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "class_name",
+        "targetColumn": "class_name"
+      },
+      {
+        "id": 83,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 84,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 85,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 86,
+        "source": "model.rtl_rdp.dim_departments",
+        "target": "model.rtl_rdp.vw_dim_departments",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 87,
+        "source": "model.rtl_rdp.dim_departments",
+        "target": "model.rtl_rdp.vw_dim_departments",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 88,
+        "source": "model.rtl_rdp.dim_departments",
+        "target": "model.rtl_rdp.vw_dim_departments",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 89,
+        "source": "model.rtl_rdp.dim_departments",
+        "target": "model.rtl_rdp.vw_dim_departments",
+        "sourceColumn": "cust_department_manager",
+        "targetColumn": "cust_department_manager"
+      },
+      {
+        "id": 90,
+        "source": "model.rtl_rdp.dim_departments",
+        "target": "model.rtl_rdp.vw_dim_departments",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 91,
+        "source": "model.rtl_rdp.dim_departments",
+        "target": "model.rtl_rdp.vw_dim_departments",
+        "sourceColumn": "rdp_created_at",
+        "targetColumn": "rdp_created_at"
+      },
+      {
+        "id": 92,
+        "source": "model.rtl_rdp.dim_departments",
+        "target": "model.rtl_rdp.vw_dim_departments",
+        "sourceColumn": "rdp_updated_at",
+        "targetColumn": "rdp_updated_at"
+      },
+      {
+        "id": 93,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "class_id",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 94,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 95,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "class_number",
+        "targetColumn": "class_number"
+      },
+      {
+        "id": 96,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "class_name",
+        "targetColumn": "class_name"
+      },
+      {
+        "id": 97,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 98,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 99,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 100,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "rdp_created_at",
+        "targetColumn": "rdp_created_at"
+      },
+      {
+        "id": 101,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "rdp_updated_at",
+        "targetColumn": "rdp_updated_at"
+      },
+      {
+        "id": 102,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "style_id",
+        "targetColumn": "style_id"
+      },
+      {
+        "id": 103,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "class_id",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 104,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 105,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "style_number",
+        "targetColumn": "style_number"
+      },
+      {
+        "id": 106,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "style_name",
+        "targetColumn": "style_name"
+      },
+      {
+        "id": 107,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "class_number",
+        "targetColumn": "class_number"
+      },
+      {
+        "id": 108,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "class_name",
+        "targetColumn": "class_name"
+      },
+      {
+        "id": 109,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 110,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 111,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 112,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "rdp_created_at",
+        "targetColumn": "rdp_created_at"
+      },
+      {
+        "id": 113,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "rdp_updated_at",
+        "targetColumn": "rdp_updated_at"
+      },
+      {
+        "id": 114,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "item_id",
+        "targetColumn": "item_id"
+      },
+      {
+        "id": 115,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "style_id",
+        "targetColumn": "style_id"
+      },
+      {
+        "id": 116,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "class_id",
+        "targetColumn": "class_id"
+      },
+      {
+        "id": 117,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "department_id",
+        "targetColumn": "department_id"
+      },
+      {
+        "id": 118,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "item_number",
+        "targetColumn": "item_number"
+      },
+      {
+        "id": 119,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "item_name",
+        "targetColumn": "item_name"
+      },
+      {
+        "id": 120,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "style_number",
+        "targetColumn": "style_number"
+      },
+      {
+        "id": 121,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "style_name",
+        "targetColumn": "style_name"
+      },
+      {
+        "id": 122,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "class_number",
+        "targetColumn": "class_number"
+      },
+      {
+        "id": 123,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "class_name",
+        "targetColumn": "class_name"
+      },
+      {
+        "id": 124,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "department_number",
+        "targetColumn": "department_number"
+      },
+      {
+        "id": 125,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "department_name",
+        "targetColumn": "department_name"
+      },
+      {
+        "id": 126,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "rdp_source_system",
+        "targetColumn": "rdp_source_system"
+      },
+      {
+        "id": 127,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "rdp_created_at",
+        "targetColumn": "rdp_created_at"
+      },
+      {
+        "id": 128,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "rdp_updated_at",
+        "targetColumn": "rdp_updated_at"
+      },
+      {
+        "id": 129,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_departments",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 130,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_classes",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 131,
+        "source": "model.rtl_rdp_client.stg_departments",
+        "target": "model.rtl_rdp_client.stg_classes",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 132,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_styles",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 133,
+        "source": "model.rtl_rdp_client.stg_classes",
+        "target": "model.rtl_rdp_client.stg_styles",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 134,
+        "source": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+        "target": "model.rtl_rdp_client.stg_items",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 135,
+        "source": "model.rtl_rdp_client.stg_styles",
+        "target": "model.rtl_rdp_client.stg_items",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 136,
+        "source": "model.rtl_rdp_client.stg_departments",
+        "target": "model.rtl_rdp.int_departments",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 137,
+        "source": "model.rtl_rdp_client.stg_styles",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 138,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.int_styles",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 139,
+        "source": "model.rtl_rdp_client.stg_items",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 140,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.int_items",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 141,
+        "source": "model.rtl_rdp_client.stg_classes",
+        "target": "model.rtl_rdp.int_classes",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 142,
+        "source": "model.rtl_rdp.int_departments",
+        "target": "model.rtl_rdp.int_classes",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 143,
+        "source": "model.rtl_rdp.int_departments",
+        "target": "model.rtl_rdp.dim_departments",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 144,
+        "source": "model.rtl_rdp.int_classes",
+        "target": "model.rtl_rdp.dim_classes",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 145,
+        "source": "model.rtl_rdp.dim_departments",
+        "target": "model.rtl_rdp.dim_classes",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 146,
+        "source": "model.rtl_rdp.int_styles",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 147,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.dim_styles",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 148,
+        "source": "model.rtl_rdp.int_items",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 149,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.dim_items",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 150,
+        "source": "model.rtl_rdp.dim_departments",
+        "target": "model.rtl_rdp.vw_dim_departments",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 151,
+        "source": "model.rtl_rdp.dim_classes",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 152,
+        "source": "model.rtl_rdp.vw_dim_departments",
+        "target": "model.rtl_rdp.vw_dim_classes",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 153,
+        "source": "model.rtl_rdp.dim_styles",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 154,
+        "source": "model.rtl_rdp.vw_dim_classes",
+        "target": "model.rtl_rdp.vw_dim_styles",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 155,
+        "source": "model.rtl_rdp.dim_items",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "",
+        "targetColumn": ""
+      },
+      {
+        "id": 156,
+        "source": "model.rtl_rdp.vw_dim_styles",
+        "target": "model.rtl_rdp.vw_dim_items",
+        "sourceColumn": "",
+        "targetColumn": ""
+      }
+    ],
+    "parents": {
+      "model.rtl_rdp_client.stg_departments": {
+        "department_id": [
+          {
+            "column": "product_category_name",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "product_category_name",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "product_category_name",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "cust_department_manager": [],
+        "rdp_source_system": []
+      },
+      "model.rtl_rdp_client.stg_classes": {
+        "class_id": [
+          {
+            "column": "product_category_name",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "product_category_name",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "product_category_name",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "product_category_name",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "rdp_source_system": []
+      },
+      "model.rtl_rdp_client.stg_styles": {
+        "style_id": [
+          {
+            "column": "product_id",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "product_category_name",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "transformation"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "product_id",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "product_category_name",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "transformation"
+          }
+        ],
+        "rdp_source_system": []
+      },
+      "model.rtl_rdp_client.stg_items": {
+        "item_id": [
+          {
+            "column": "product_id",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "style_id": [
+          {
+            "column": "product_id",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "item_number": [
+          {
+            "column": "product_id",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "rename"
+          }
+        ],
+        "item_name": [
+          {
+            "column": "product_category_name",
+            "dbt_node": "source.rtl_rdp_client.merchandising.olist_products_dataset",
+            "lineage_type": "transformation"
+          }
+        ],
+        "rdp_source_system": []
+      },
+      "model.rtl_rdp.int_departments": {
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp_client.stg_departments",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp_client.stg_departments",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp_client.stg_departments",
+            "lineage_type": "transformation"
+          }
+        ],
+        "cust_department_manager": [
+          {
+            "column": "cust_department_manager",
+            "dbt_node": "model.rtl_rdp_client.stg_departments",
+            "lineage_type": "transformation"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp_client.stg_departments",
+            "lineage_type": "transformation"
+          }
+        ]
+      },
+      "model.rtl_rdp.int_styles": {
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp_client.stg_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp_client.stg_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "transformation"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp_client.stg_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp_client.stg_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "transformation"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "transformation"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp_client.stg_styles",
+            "lineage_type": "transformation"
+          }
+        ]
+      },
+      "model.rtl_rdp.int_items": {
+        "item_id": [
+          {
+            "column": "item_id",
+            "dbt_node": "model.rtl_rdp_client.stg_items",
+            "lineage_type": "transformation"
+          }
+        ],
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp_client.stg_items",
+            "lineage_type": "transformation"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "item_number": [
+          {
+            "column": "item_number",
+            "dbt_node": "model.rtl_rdp_client.stg_items",
+            "lineage_type": "transformation"
+          }
+        ],
+        "item_name": [
+          {
+            "column": "item_name",
+            "dbt_node": "model.rtl_rdp_client.stg_items",
+            "lineage_type": "transformation"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "transformation"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp_client.stg_items",
+            "lineage_type": "transformation"
+          }
+        ]
+      },
+      "model.rtl_rdp.int_classes": {
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp_client.stg_classes",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp_client.stg_classes",
+            "lineage_type": "transformation"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp_client.stg_classes",
+            "lineage_type": "transformation"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp_client.stg_classes",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_departments",
+            "lineage_type": "transformation"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_departments",
+            "lineage_type": "transformation"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp_client.stg_classes",
+            "lineage_type": "transformation"
+          }
+        ]
+      },
+      "model.rtl_rdp.dim_departments": {
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.int_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "cust_department_manager": [
+          {
+            "column": "cust_department_manager",
+            "dbt_node": "model.rtl_rdp.int_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.int_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_created_at": [],
+        "rdp_updated_at": []
+      },
+      "model.rtl_rdp.dim_classes": {
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.int_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_created_at": [],
+        "rdp_updated_at": []
+      },
+      "model.rtl_rdp.dim_styles": {
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.int_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_created_at": [],
+        "rdp_updated_at": []
+      },
+      "model.rtl_rdp.dim_items": {
+        "item_id": [
+          {
+            "column": "item_id",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "item_number": [
+          {
+            "column": "item_number",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "item_name": [
+          {
+            "column": "item_name",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.int_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_created_at": [],
+        "rdp_updated_at": []
+      },
+      "model.rtl_rdp.vw_dim_departments": {
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.dim_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.dim_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.dim_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "cust_department_manager": [
+          {
+            "column": "cust_department_manager",
+            "dbt_node": "model.rtl_rdp.dim_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.dim_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_created_at": [
+          {
+            "column": "rdp_created_at",
+            "dbt_node": "model.rtl_rdp.dim_departments",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_updated_at": [
+          {
+            "column": "rdp_updated_at",
+            "dbt_node": "model.rtl_rdp.dim_departments",
+            "lineage_type": "pass-through"
+          }
+        ]
+      },
+      "model.rtl_rdp.vw_dim_classes": {
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.dim_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.dim_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.dim_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.dim_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.dim_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.dim_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.dim_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_created_at": [
+          {
+            "column": "rdp_created_at",
+            "dbt_node": "model.rtl_rdp.dim_classes",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_updated_at": [
+          {
+            "column": "rdp_updated_at",
+            "dbt_node": "model.rtl_rdp.dim_classes",
+            "lineage_type": "pass-through"
+          }
+        ]
+      },
+      "model.rtl_rdp.vw_dim_styles": {
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_created_at": [
+          {
+            "column": "rdp_created_at",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_updated_at": [
+          {
+            "column": "rdp_updated_at",
+            "dbt_node": "model.rtl_rdp.dim_styles",
+            "lineage_type": "pass-through"
+          }
+        ]
+      },
+      "model.rtl_rdp.vw_dim_items": {
+        "item_id": [
+          {
+            "column": "item_id",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "item_number": [
+          {
+            "column": "item_number",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "item_name": [
+          {
+            "column": "item_name",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_created_at": [
+          {
+            "column": "rdp_created_at",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ],
+        "rdp_updated_at": [
+          {
+            "column": "rdp_updated_at",
+            "dbt_node": "model.rtl_rdp.dim_items",
+            "lineage_type": "pass-through"
+          }
+        ]
+      }
+    },
+    "children": {
+      "source.rtl_rdp_client.merchandising.olist_products_dataset": {
+        "product_category_name": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp_client.stg_departments"
+          },
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp_client.stg_departments"
+          },
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp_client.stg_departments"
+          },
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp_client.stg_classes"
+          },
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp_client.stg_classes"
+          },
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp_client.stg_classes"
+          },
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp_client.stg_classes"
+          },
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp_client.stg_styles"
+          },
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp_client.stg_styles"
+          },
+          {
+            "column": "item_name",
+            "dbt_node": "model.rtl_rdp_client.stg_items"
+          }
+        ],
+        "product_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp_client.stg_styles"
+          },
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp_client.stg_styles"
+          },
+          {
+            "column": "item_id",
+            "dbt_node": "model.rtl_rdp_client.stg_items"
+          },
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp_client.stg_items"
+          },
+          {
+            "column": "item_number",
+            "dbt_node": "model.rtl_rdp_client.stg_items"
+          }
+        ]
+      },
+      "model.rtl_rdp_client.stg_departments": {
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.int_departments"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_departments"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_departments"
+          }
+        ],
+        "cust_department_manager": [
+          {
+            "column": "cust_department_manager",
+            "dbt_node": "model.rtl_rdp.int_departments"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.int_departments"
+          }
+        ]
+      },
+      "model.rtl_rdp_client.stg_styles": {
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp.int_styles"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.int_styles"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.int_styles"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.int_styles"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.int_styles"
+          }
+        ]
+      },
+      "model.rtl_rdp.int_classes": {
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.int_styles"
+          },
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.dim_classes"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.int_styles"
+          },
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.dim_classes"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.int_styles"
+          },
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.dim_classes"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_styles"
+          },
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.dim_classes"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_styles"
+          },
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.dim_classes"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.dim_classes"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.dim_classes"
+          }
+        ]
+      },
+      "model.rtl_rdp_client.stg_items": {
+        "item_id": [
+          {
+            "column": "item_id",
+            "dbt_node": "model.rtl_rdp.int_items"
+          }
+        ],
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp.int_items"
+          }
+        ],
+        "item_number": [
+          {
+            "column": "item_number",
+            "dbt_node": "model.rtl_rdp.int_items"
+          }
+        ],
+        "item_name": [
+          {
+            "column": "item_name",
+            "dbt_node": "model.rtl_rdp.int_items"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.int_items"
+          }
+        ]
+      },
+      "model.rtl_rdp.int_styles": {
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.int_items"
+          },
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.dim_styles"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.int_items"
+          },
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.dim_styles"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.int_items"
+          },
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.dim_styles"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.int_items"
+          },
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.dim_styles"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.int_items"
+          },
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.dim_styles"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.int_items"
+          },
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.dim_styles"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_items"
+          },
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.dim_styles"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_items"
+          },
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.dim_styles"
+          }
+        ],
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp.dim_styles"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.dim_styles"
+          }
+        ]
+      },
+      "model.rtl_rdp_client.stg_classes": {
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.int_classes"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.int_classes"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.int_classes"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.int_classes"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.int_classes"
+          }
+        ]
+      },
+      "model.rtl_rdp.int_departments": {
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.int_classes"
+          },
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.dim_departments"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.int_classes"
+          },
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.dim_departments"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.dim_departments"
+          }
+        ],
+        "cust_department_manager": [
+          {
+            "column": "cust_department_manager",
+            "dbt_node": "model.rtl_rdp.dim_departments"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.dim_departments"
+          }
+        ]
+      },
+      "model.rtl_rdp.int_items": {
+        "item_id": [
+          {
+            "column": "item_id",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "item_number": [
+          {
+            "column": "item_number",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "item_name": [
+          {
+            "column": "item_name",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.dim_items"
+          }
+        ]
+      },
+      "model.rtl_rdp.dim_departments": {
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.vw_dim_departments"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.vw_dim_departments"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.vw_dim_departments"
+          }
+        ],
+        "cust_department_manager": [
+          {
+            "column": "cust_department_manager",
+            "dbt_node": "model.rtl_rdp.vw_dim_departments"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.vw_dim_departments"
+          }
+        ],
+        "rdp_created_at": [
+          {
+            "column": "rdp_created_at",
+            "dbt_node": "model.rtl_rdp.vw_dim_departments"
+          }
+        ],
+        "rdp_updated_at": [
+          {
+            "column": "rdp_updated_at",
+            "dbt_node": "model.rtl_rdp.vw_dim_departments"
+          }
+        ]
+      },
+      "model.rtl_rdp.dim_classes": {
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.vw_dim_classes"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.vw_dim_classes"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.vw_dim_classes"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.vw_dim_classes"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.vw_dim_classes"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.vw_dim_classes"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.vw_dim_classes"
+          }
+        ],
+        "rdp_created_at": [
+          {
+            "column": "rdp_created_at",
+            "dbt_node": "model.rtl_rdp.vw_dim_classes"
+          }
+        ],
+        "rdp_updated_at": [
+          {
+            "column": "rdp_updated_at",
+            "dbt_node": "model.rtl_rdp.vw_dim_classes"
+          }
+        ]
+      },
+      "model.rtl_rdp.dim_styles": {
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "rdp_created_at": [
+          {
+            "column": "rdp_created_at",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ],
+        "rdp_updated_at": [
+          {
+            "column": "rdp_updated_at",
+            "dbt_node": "model.rtl_rdp.vw_dim_styles"
+          }
+        ]
+      },
+      "model.rtl_rdp.dim_items": {
+        "item_id": [
+          {
+            "column": "item_id",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "style_id": [
+          {
+            "column": "style_id",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "class_id": [
+          {
+            "column": "class_id",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "department_id": [
+          {
+            "column": "department_id",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "item_number": [
+          {
+            "column": "item_number",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "item_name": [
+          {
+            "column": "item_name",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "style_number": [
+          {
+            "column": "style_number",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "style_name": [
+          {
+            "column": "style_name",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "class_number": [
+          {
+            "column": "class_number",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "class_name": [
+          {
+            "column": "class_name",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "department_number": [
+          {
+            "column": "department_number",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "department_name": [
+          {
+            "column": "department_name",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "rdp_source_system": [
+          {
+            "column": "rdp_source_system",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "rdp_created_at": [
+          {
+            "column": "rdp_created_at",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ],
+        "rdp_updated_at": [
+          {
+            "column": "rdp_updated_at",
+            "dbt_node": "model.rtl_rdp.vw_dim_items"
+          }
+        ]
+      }
+    }
+  },
+  "tree": {
+    "byDatabase": {
+      "crested-sentry-489814-b6": {
+        "dev_rdp_dwh": [
+          "model.rtl_rdp.dim_classes",
+          "model.rtl_rdp.dim_departments",
+          "model.rtl_rdp.dim_items",
+          "model.rtl_rdp.dim_styles"
+        ],
+        "dev_rdp_dwh_views": [
+          "model.rtl_rdp.vw_dim_classes",
+          "model.rtl_rdp.vw_dim_departments",
+          "model.rtl_rdp.vw_dim_items",
+          "model.rtl_rdp.vw_dim_styles"
+        ],
+        "dev_rdp_staging": [
+          "model.rtl_rdp_client.stg_classes",
+          "model.rtl_rdp_client.stg_departments",
+          "model.rtl_rdp_client.stg_items",
+          "model.rtl_rdp_client.stg_styles"
+        ],
+        "dev_rdp_temp": [
+          "model.rtl_rdp.int_classes",
+          "model.rtl_rdp.int_departments",
+          "model.rtl_rdp.int_items",
+          "model.rtl_rdp.int_styles"
+        ],
+        "olist_landing": [
+          "source.rtl_rdp_client.merchandising.olist_products_dataset"
+        ]
+      }
+    },
+    "byPath": {
+      "merged_product_hierarchy": {
+        "models": {
+          "dwh": {
+            "products": {
+              "product_hierarchy": {
+                "__items__": [
+                  "model.rtl_rdp.dim_classes",
+                  "model.rtl_rdp.dim_departments",
+                  "model.rtl_rdp.dim_items",
+                  "model.rtl_rdp.dim_styles"
+                ]
+              }
+            }
+          },
+          "dwh_views": {
+            "products": {
+              "product_hierarchy": {
+                "__items__": [
+                  "model.rtl_rdp.vw_dim_classes",
+                  "model.rtl_rdp.vw_dim_departments",
+                  "model.rtl_rdp.vw_dim_items",
+                  "model.rtl_rdp.vw_dim_styles"
+                ]
+              }
+            }
+          },
+          "staging": {
+            "products": {
+              "product_hierarchy": {
+                "__items__": [
+                  "model.rtl_rdp_client.stg_classes",
+                  "model.rtl_rdp_client.stg_departments",
+                  "model.rtl_rdp_client.stg_items",
+                  "model.rtl_rdp_client.stg_styles"
+                ]
+              }
+            }
+          },
+          "temp": {
+            "products": {
+              "product_hierarchy": {
+                "__items__": [
+                  "model.rtl_rdp.int_classes",
+                  "model.rtl_rdp.int_departments",
+                  "model.rtl_rdp.int_items",
+                  "model.rtl_rdp.int_styles"
+                ]
+              }
+            }
+          }
+        },
+        "sources": {
+          "models": {
+            "staging": {
+              "olist_landing": {
+                "__items__": [
+                  "source.rtl_rdp_client.merchandising.olist_products_dataset"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
