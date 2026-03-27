@@ -30,7 +30,8 @@ import sys
 import yaml
 from pathlib import Path
 
-BASE = Path(__file__).parent
+_here = Path(__file__).parent
+BASE = _here if (_here / "rtl_rdp").exists() else _here.parent
 CLIENT_TARGET = BASE / "rtl_rdp_client" / "target"
 RDP_TARGET    = BASE / "rtl_rdp"        / "target"
 BUILD_DIR     = BASE / "build"

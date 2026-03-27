@@ -14,7 +14,8 @@ import shutil
 import yaml
 from pathlib import Path
 
-BASE = Path(__file__).parent
+_here = Path(__file__).parent
+BASE = _here if (_here / "rtl_rdp").exists() else _here.parent
 RDP  = BASE / "rtl_rdp"
 
 REFERENCE_FILES = {
