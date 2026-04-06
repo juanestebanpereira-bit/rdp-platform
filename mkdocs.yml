@@ -19,6 +19,8 @@ markdown_extensions:
 
 extra_javascript:
   - javascripts/mermaid-config.js
+  - javascripts/svg-pan-zoom.min.js
+  - javascripts/erd-pan-zoom.js
 
 nav:
   - Home: index.md
@@ -26,7 +28,7 @@ nav:
     - Product Hierarchy:
       - Summary: subject_areas/products/product_hierarchy/summary.md
       - ERD: subject_areas/products/product_hierarchy/erd.md
-      - Dictionary: subject_areas/products/product_hierarchy/dictionary.md
+      - Data Dictionary: subject_areas/products/product_hierarchy/dictionary.md
       - Lineage: subject_areas/products/product_hierarchy/lineage.md
   - Reference:
     - Implementation Guide: reference/contract.md

@@ -3,6 +3,7 @@
 ```mermaid
 %%{init: {"er": {"layoutDirection": "RL"}} }%%
 erDiagram
+  direction LR
   "VW_DIM_DEPARTMENTS" {
     string department_id PK
     string department_number
@@ -54,7 +55,7 @@ erDiagram
     timestamp rdp_created_at
     timestamp rdp_updated_at
   }
-  "VW_DIM_CLASSES" }|--|| "VW_DIM_DEPARTMENTS": department_id
-  "VW_DIM_STYLES" }|--|| "VW_DIM_CLASSES": class_id
-  "VW_DIM_ITEMS" }|--|| "VW_DIM_STYLES": style_id
+  "VW_DIM_DEPARTMENTS" ||--|{ "VW_DIM_CLASSES": department_id
+  "VW_DIM_CLASSES" ||--|{ "VW_DIM_STYLES": class_id
+  "VW_DIM_STYLES" ||--|{ "VW_DIM_ITEMS": style_id
 ```

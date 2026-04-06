@@ -252,18 +252,41 @@ def postprocess_erd(erd_path: Path, subject_area: str, component: str) -> None:
                     return i
             return len(entity_order)
         entity_blocks.sort(key=sort_key)
+        relationship_lines.sort(key=sort_key)
 
     # Strip "MODEL.PACKAGE." prefix from all entity names (e.g. MODEL.RTL_RDP.VW_DIM_X → VW_DIM_X)
+    import re
     def strip_prefix(text: str) -> str:
-        import re
         return re.sub(r'"[A-Z_]+\.[A-Z_]+\.([A-Z_]+)"', r'"\1"', text)
 
     entity_blocks      = [strip_prefix(b) for b in entity_blocks]
     relationship_lines = [strip_prefix(l) for l in relationship_lines]
 
+    # Flip any child→parent relationships to parent→child so Mermaid renders
+    # in hierarchy order (e.g. }|--|| becomes ||--|{, entities swapped).
+    if entity_order:
+        def flip_if_reversed(line):
+            m = re.match(r'(\s*)"([^"]+)"\s+(\S+)\s+"([^"]+)":\s*(\S+)', line)
+            if not m:
+                return line
+            indent, left_ent, notation, right_ent, label = m.groups()
+            left_idx  = next((i for i, n in enumerate(entity_order) if n in left_ent.upper()),  len(entity_order))
+            right_idx = next((i for i, n in enumerate(entity_order) if n in right_ent.upper()), len(entity_order))
+            if left_idx <= right_idx:
+                return line  # already parent→child
+            sep = '--' if '--' in notation else '..'
+            parts = notation.split(sep, 1)
+            if len(parts) != 2:
+                return line
+            left_tok, right_tok = parts
+            new_left  = right_tok[::-1].replace('{', '}')
+            new_right = left_tok[::-1].replace('}', '{')
+            return f'{indent}"{right_ent}" {new_left}{sep}{new_right} "{left_ent}": {label}'
+        relationship_lines = [flip_if_reversed(l) for l in relationship_lines]
+
     title = f"# {component.replace('_', ' ').title()} — ERD\n\n"
     directive = '%%{init: {"er": {"layoutDirection": "RL"}} }%%'
-    body = "\n".join([header] + entity_blocks + relationship_lines)
+    body = "\n".join([header, "  direction LR"] + entity_blocks + relationship_lines)
     erd_path.write_text(f"{title}```mermaid\n{directive}\n{body}\n```\n")
     print(f"  Post-processed {erd_path.name}: {len(entity_blocks)} entities, LR layout")
 
