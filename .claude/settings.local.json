@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ln -s ../../../rtl_rdp/CONTRACT.md /Users/juanpereira/projects/retail-analytics/docs/reference/contract.md)",
+      "Bash(ln -s ../../../rtl_rdp/DATA_MODEL.md /Users/juanpereira/projects/retail-analytics/docs/reference/data_model_index.md)",
+      "Bash(ln -s ../../../rtl_rdp/STYLE_GUIDE.md /Users/juanpereira/projects/retail-analytics/docs/reference/style_guide.md)",
+      "Bash(dbt-env/bin/mkdocs build:*)",
+      "Bash(dbt-env/bin/dbterd run:*)",
+      "Bash(grep -o \"mermaid[^;]\\\\{0,200\\\\}\" /Users/juanpereira/projects/retail-analytics/site/assets/javascripts/bundle.79ae519e.min.js)"
+    ]
+  }
+}
