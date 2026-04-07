@@ -6,7 +6,10 @@
       "Bash(ln -s ../../../rtl_rdp/STYLE_GUIDE.md /Users/juanpereira/projects/retail-analytics/docs/reference/style_guide.md)",
       "Bash(dbt-env/bin/mkdocs build:*)",
       "Bash(dbt-env/bin/dbterd run:*)",
-      "Bash(grep -o \"mermaid[^;]\\\\{0,200\\\\}\" /Users/juanpereira/projects/retail-analytics/site/assets/javascripts/bundle.79ae519e.min.js)"
+      "Bash(grep -o \"mermaid[^;]\\\\{0,200\\\\}\" /Users/juanpereira/projects/retail-analytics/site/assets/javascripts/bundle.79ae519e.min.js)",
+      "Bash(git -C /Users/juanpereira/projects/retail-analytics pull)",
+      "Bash(git -C /Users/juanpereira/projects/retail-analytics/rtl_rdp pull)",
+      "Bash(git -C /Users/juanpereira/projects/retail-analytics/rtl_rdp_client pull)"
     ]
   }
 }
