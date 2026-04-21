@@ -1,15 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ln -s ../../../rtl_rdp/CONTRACT.md /Users/juanpereira/projects/retail-analytics/docs/reference/contract.md)",
-      "Bash(ln -s ../../../rtl_rdp/DATA_MODEL.md /Users/juanpereira/projects/retail-analytics/docs/reference/data_model_index.md)",
-      "Bash(ln -s ../../../rtl_rdp/STYLE_GUIDE.md /Users/juanpereira/projects/retail-analytics/docs/reference/style_guide.md)",
+      "Bash(ln -s ../../../rdp-model/CONTRACT.md /Users/juanpereira/projects/rdp-platform/docs/reference/contract.md)",
+      "Bash(ln -s ../../../rdp-model/DATA_MODEL.md /Users/juanpereira/projects/rdp-platform/docs/reference/data_model_index.md)",
+      "Bash(ln -s ../../../rdp-model/STYLE_GUIDE.md /Users/juanpereira/projects/rdp-platform/docs/reference/style_guide.md)",
       "Bash(dbt-env/bin/mkdocs build:*)",
       "Bash(dbt-env/bin/dbterd run:*)",
-      "Bash(grep -o \"mermaid[^;]\\\\{0,200\\\\}\" /Users/juanpereira/projects/retail-analytics/site/assets/javascripts/bundle.79ae519e.min.js)",
-      "Bash(git -C /Users/juanpereira/projects/retail-analytics pull)",
-      "Bash(git -C /Users/juanpereira/projects/retail-analytics/rtl_rdp pull)",
-      "Bash(git -C /Users/juanpereira/projects/retail-analytics/rtl_rdp_client pull)"
+      "Bash(grep -o \"mermaid[^;]\\{0,200\\}\" /Users/juanpereira/projects/rdp-platform/site/assets/javascripts/bundle.79ae519e.min.js)",
+      "Bash(git -C /Users/juanpereira/projects/rdp-platform pull)",
+      "Bash(git -C /Users/juanpereira/projects/rdp-model pull)",
+      "Bash(git -C /Users/juanpereira/projects/rdp-client pull)",
+      "Bash(grep -r \"\\.\\.\\/rdp-model\\|\\.\\/rdp-model\\|\\.\\.\\/rdp-client\\|\\.\\/rdp-client\" --include=\"*.py\" --include=\"*.yml\" --include=\"*.yaml\" --include=\"*.sh\" --include=\"*.md\" ! -path \"./dbt-env/*\" ! -path \"./target/*\" ! -path \"./.git/*\" ! -path \"./dbt_packages/*\" ! -path \"./site/*\")"
     ]
   }
 }

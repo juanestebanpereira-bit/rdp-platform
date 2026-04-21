@@ -31,12 +31,12 @@ import yaml
 from pathlib import Path
 
 _here = Path(__file__).parent
-BASE = _here if (_here / "rtl_rdp").exists() else _here.parent
-CLIENT_TARGET = BASE / "rtl_rdp_client" / "target"
-RDP_TARGET    = BASE / "rtl_rdp"        / "target"
-BUILD_DIR     = BASE / "build"
-DOCS_DIR      = BASE / "docs"
-COLIBRI       = BASE / "dbt-env" / "bin" / "colibri"
+BASE = _here if (_here / "rdp-model").exists() else _here.parent
+CLIENT_TARGET = BASE / "rdp-client" / "target"
+RDP_TARGET    = BASE / "rdp-model"  / "target"
+BUILD_DIR     = _here / "build"
+DOCS_DIR      = _here / "docs"
+COLIBRI       = _here / "dbt-env" / "bin" / "colibri"
 
 
 def load(path: Path) -> dict:
@@ -214,7 +214,7 @@ def postprocess_erd(erd_path: Path, subject_area: str, component: str) -> None:
     dbterd outputs plain `erDiagram ...` text. This makes it render correctly
     in MkDocs Material with Mermaid and reads left-to-right in hierarchy order.
     """
-    schema_path = BASE / "rtl_rdp" / "models" / "dwh_views" / subject_area / component / "schema.yml"
+    schema_path = BASE / "rdp-model" / "models" / "dwh_views" / subject_area / component / "schema.yml"
     entity_order = []
     if schema_path.exists():
         with open(schema_path) as f:
@@ -300,7 +300,7 @@ def run_colibri(manifest_path: Path, catalog_path: Path, output_dir: Path) -> Pa
             "--catalog",    str(catalog_path),
             "--output-dir", str(output_dir),
         ],
-        cwd=str(BASE),
+        cwd=str(_here),
     )
     if result.returncode != 0:
         print(f"\ncolibri generate exited with code {result.returncode}", file=sys.stderr)

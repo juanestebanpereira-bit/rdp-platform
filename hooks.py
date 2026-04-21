@@ -15,8 +15,8 @@ import yaml
 from pathlib import Path
 
 _here = Path(__file__).parent
-BASE = _here if (_here / "rtl_rdp").exists() else _here.parent
-RDP  = BASE / "rtl_rdp"
+BASE = _here if (_here / "rdp-model").exists() else _here.parent
+RDP  = BASE / "rdp-model"
 
 REFERENCE_FILES = {
     "contract.md":         RDP / "CONTRACT.md",

@@ -2,8 +2,8 @@ build/
 site/
 docs/reference/
 docs/**/dictionary.md
-rtl_rdp/
-rtl_rdp_client/
+rdp-model/
+rdp-client/
 dbt-env/
 __pycache__/
 logs/
