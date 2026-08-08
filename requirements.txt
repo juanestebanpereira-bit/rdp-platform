@@ -1,0 +1,14 @@
+# Direct dependencies for dbt-env, the shared venv used to run dbt and the
+# lineage/ERD tooling referenced in CLAUDE.md and README.md. Transitive deps
+# are resolved by pip, not pinned here.
+#
+# Setup:
+#   python3.12 -m venv dbt-env
+#   dbt-env/bin/pip install -r requirements.txt
+
+dbt-core==1.11.7
+dbt-bigquery==1.11.1
+dbterd==1.30.0
+dbt-colibri==0.3.6
+mkdocs==1.6.1
+mkdocs-material==9.7.6

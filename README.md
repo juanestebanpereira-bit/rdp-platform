@@ -31,7 +31,26 @@ RDP has two documentation sites, serving different audiences:
   here.
 
 `rdp-platform` hosts neither site. It provides the tooling a customer's
-`rdp-client` site build depends on — manifest merging and ERD generation:
+`rdp-client` site build depends on — manifest merging and ERD generation.
+
+### Setup
+
+**Prerequisites:** [Homebrew](https://brew.sh) and Python 3.12
+(`brew install python@3.12`).
+
+```bash
+./scripts/setup.sh       # bootstraps pipx CLI tools + dbt-env venv; safe to re-run
+source dbt-env/bin/activate
+```
+
+All dbt, dbterd, and colibri commands (here and in `rdp-model`/`rdp-client`)
+run through the shared venv `dbt-env/`, built from `requirements.txt`. To
+rebuild it by hand instead of via the script:
+
+```bash
+python3.12 -m venv dbt-env
+dbt-env/bin/pip install -r requirements.txt
+```
 
 ```bash
 # Generate merged manifests (required before ERD/lineage generation)
