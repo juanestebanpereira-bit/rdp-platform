@@ -1,62 +1,49 @@
-# RDP Platform — Monorepo Root
+# RDP Platform
 
-This repository is the root of the Retail Data Platform (RDP) monorepo.
-It contains three separate git repositories co-located in a single directory,
-plus shared tooling that spans all of them.
+This repository holds shared tooling for the Retail Data Platform (RDP) —
+manifest merging, ERD/lineage generation — used to build documentation for
+each customer implementation. It hosts no documentation site of its own.
 
 ## Repository Structure
 
-```
-~/projects/
-├── rdp-platform/          # MkDocs documentation site + shared tooling (this repo)
-│   ├── docs/
-│   ├── build/
-│   └── merge_manifests.py
-├── rdp-model/             # RDP product — published as a dbt package (own git repo)
-└── rdp-client/            # Customer implementation — reference client (own git repo)
-```
-
-## Three Git Repositories
-
-Although `rdp-model`, `rdp-client`, and `rdp-platform` all live under `~/projects/`,
-they are **three independent git repositories**:
-
-| Repository | Purpose | Audience |
-|---|---|---|
-| `rdp-platform` (root) | MkDocs site, shared tooling | Documentation consumers |
-| `rdp-model` | RDP product code, published as a dbt package | RDP developers |
-| `rdp-client` | Reference customer implementation | Customer teams |
-
-This separation exists because `rtl_rdp` has its own release cycle and is
-distributed to customers as a dbt package via `dbt deps`. It must be
-versioned and committed independently of any customer implementation.
-`rtl_rdp_client` is a reference implementation that customers fork —
-it must not be coupled to the product repo.
+See [rdp-docs/README.md](../rdp-docs/README.md) for the full repo map. RDP
+spans four independent git repositories — `rdp-docs`, `rdp-model`,
+`rdp-client`, `rdp-platform` — siblings under `~/projects/`, not nested
+inside one another.
 
 When committing changes, always check which repo you are in:
 
 ```bash
 git -C ../rdp-model status
 git -C ../rdp-client status
-git status          # rdp-platform repo
+git status          # this repo (rdp-platform)
 ```
 
-## Documentation Site
+## Documentation Sites
 
-The MkDocs site integrates output from both dbt projects into a single
-documentation portal covering ERDs, lineage diagrams, and the data dictionary.
+RDP has two documentation sites, serving different audiences:
+
+- **[rdp-docs](../rdp-docs/)** — one public product site: ecosystem
+  overview, architecture decisions, glossary, design principles.
+- **Each customer's `rdp-client` fork** — one generated site per customer,
+  covering their enabled subject areas (ERDs, lineage diagrams, data
+  dictionary). The MkDocs config for this site lives in `rdp-client`, not
+  here.
+
+`rdp-platform` hosts neither site. It provides the tooling a customer's
+`rdp-client` site build depends on — manifest merging and ERD generation:
 
 ```bash
 # Generate merged manifests (required before ERD/lineage generation)
 python3 merge_manifests.py --subject-area products --component product_hierarchy
 
-# Generate ERD
+# Generate ERD — output goes to rdp-client's docs/ (the site lives there, not here)
 dbterd run -ad build -s "schema:dev_rdp_dwh_views" -a model_contract -t mermaid \
-  -o docs/subject_areas/products/product_hierarchy -ofn erd.md
-
-# Serve docs locally
-mkdocs serve
+  -o ../rdp-client/docs/subject_areas/products/product_hierarchy -ofn erd.md
 ```
+
+To preview a customer's site locally, run `mkdocs serve` from that
+customer's `rdp-client` repo — not from here.
 
 ## Further Reading
 

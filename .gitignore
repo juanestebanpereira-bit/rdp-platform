@@ -1,7 +1,4 @@
 build/
-site/
-docs/reference/
-docs/**/dictionary.md
 rdp-model/
 rdp-client/
 dbt-env/

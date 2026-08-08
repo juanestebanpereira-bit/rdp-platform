@@ -11,9 +11,12 @@ The merge rewires rtl_rdp nodes' depends_on to point directly at the
 model.rtl_rdp_client.stg_* nodes so lineage is continuous across the boundary.
 
 Outputs:
-  Merged manifests/catalogs → build/                                    (intermediate, gitignored)
-  Colibri lineage HTML      → docs/subject_areas/{area}/{component}/lineage/  (per component)
-                            → docs/lineage/                             (full platform, unfiltered)
+  Merged manifests/catalogs → build/                                             (intermediate, gitignored)
+  Colibri lineage HTML      → ../rdp-client/docs/subject_areas/{area}/{component}/lineage-viewer/  (per component)
+                            → ../rdp-client/docs/lineage/                        (full platform, unfiltered)
+
+Site (mkdocs.yml, docs_dir) lives in rdp-client, not here — this script
+stays in rdp-platform and writes its output across the sibling boundary.
 
 "Combined" refers only to the cross-project merge of rtl_rdp + rtl_rdp_client.
 Lineage is always scoped per component — there is no cross-component aggregation.
@@ -35,7 +38,7 @@ BASE = _here if (_here / "rdp-model").exists() else _here.parent
 CLIENT_TARGET = BASE / "rdp-client" / "target"
 RDP_TARGET    = BASE / "rdp-model"  / "target"
 BUILD_DIR     = _here / "build"
-DOCS_DIR      = _here / "docs"
+DOCS_DIR      = BASE / "rdp-client" / "docs"
 COLIBRI       = _here / "dbt-env" / "bin" / "colibri"
 
 

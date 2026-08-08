@@ -1,12 +1,16 @@
 """
 MkDocs build hooks.
 
+Invoked via ../rdp-client/mkdocs.yml's `hooks:` config (relative path) —
+this file stays in rdp-platform, shared across every customer's rdp-client
+fork, while the site itself (mkdocs.yml and docs_dir) lives in rdp-client.
+
 on_pre_build:
-  1. Copies reference documentation from rtl_rdp/ into docs/reference/.
+  1. Copies reference documentation from rdp-model/ into docs/reference/.
   2. Generates a data dictionary page per component from dwh_views schema.yml
      and doc blocks, writing docs/{subject_area}/{component}/dictionary.md.
 
-Both outputs are gitignored — sources of truth live in rtl_rdp/.
+Both outputs are gitignored in rdp-client — sources of truth live in rdp-model/.
 """
 
 import re
