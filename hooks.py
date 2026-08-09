@@ -7,10 +7,13 @@ fork, while the site itself (mkdocs.yml and docs_dir) lives in rdp-client.
 
 on_pre_build:
   1. Copies reference documentation from rdp-model/ into docs/reference/.
-  2. Generates a data dictionary page per component from dwh_views schema.yml
+  2. Copies RDP-owned component documentation (overview.md, contract.md)
+     from rdp-model/docs/{subject-area}/{component}/ into
+     docs/subject_areas/{subject_area}/{component}/.
+  3. Generates a data dictionary page per component from dwh_views schema.yml
      and doc blocks, writing docs/{subject_area}/{component}/dictionary.md.
 
-Both outputs are gitignored in rdp-client — sources of truth live in rdp-model/.
+All outputs are gitignored in rdp-client — sources of truth live in rdp-model/.
 """
 
 import re
@@ -27,6 +30,39 @@ REFERENCE_FILES = {
     "data-model-index.md":  RDP / "data-model.md",
     "style-guide.md":       RDP / "style-guide.md",
 }
+
+
+def _copy_component_docs(docs_dir: Path) -> None:
+    """
+    Copy RDP-owned component documentation from
+    rdp-model/docs/{subject-area}/{component}/ into
+    docs/subject_areas/{subject_area}/{component}/ in the customer site.
+
+    Source folders use lowercase-with-hyphens (rdp-model's file-naming
+    convention); destination folders use lowercase-with-underscores,
+    matching the existing subject_area/component naming already used
+    throughout the dbt project and generated site (e.g. product_hierarchy).
+
+    Only RDP-owned files (overview.md, contract.md) are
+    copied today. Customer-specific extensions — e.g. a suffix pattern
+    like `overview_customer.md`, read from the matching location in
+    rdp-client — are a future extension point for when a customer needs
+    to add their own content alongside the canonical RDP documentation.
+    """
+    component_docs_root = RDP / "docs"
+    if not component_docs_root.exists():
+        return
+
+    for subject_area_dir in sorted(p for p in component_docs_root.iterdir() if p.is_dir()):
+        subject_area = subject_area_dir.name.replace("-", "_")
+        for component_dir in sorted(p for p in subject_area_dir.iterdir() if p.is_dir()):
+            component = component_dir.name.replace("-", "_")
+            dest_dir = docs_dir / "subject_areas" / subject_area / component
+            for filename in ("overview.md", "contract.md"):
+                src = component_dir / filename
+                if src.exists():
+                    dest_dir.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src, dest_dir / filename)
 
 
 def _load_doc_blocks() -> dict:
@@ -104,6 +140,9 @@ def on_pre_build(config, **kwargs):
     reference_dir.mkdir(exist_ok=True)
     for dest_name, src_path in REFERENCE_FILES.items():
         shutil.copy2(src_path, reference_dir / dest_name)
+
+    # ── component docs ────────────────────────────────────────────────────────
+    _copy_component_docs(docs_dir)
 
     # ── data dictionaries ─────────────────────────────────────────────────────
     _generate_dictionaries(docs_dir)
