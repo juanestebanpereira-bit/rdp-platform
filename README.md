@@ -66,6 +66,6 @@ customer's `rdp-client` repo — not from here.
 
 ## Further Reading
 
-- `../rdp-model/CONTRACT.md` — customer staging contract and column documentation guide
+- `../rdp-model/contract.md` — customer staging contract and column documentation guide
 - `../rdp-model/CONTRIBUTING.md` — developer guide: folder conventions, tool choices, adding components
-- `../rdp-model/STYLE_GUIDE.md` — SQL and dbt coding standards
+- `../rdp-model/style-guide.md` — SQL and dbt coding standards

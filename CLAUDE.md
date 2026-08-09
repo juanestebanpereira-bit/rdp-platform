@@ -55,8 +55,8 @@ dbt-env/bin/dbterd run \
 Full architecture detail lives in `rdp-model`, not here:
 
 - **Data flow, layer overview** — [rdp-model/README.md](../rdp-model/README.md)
-- **Style guide (naming, column ordering, SQL conventions)** — [rdp-model/STYLE_GUIDE.md](../rdp-model/STYLE_GUIDE.md)
-- **Customer staging contract** — [rdp-model/CONTRACT.md](../rdp-model/CONTRACT.md)
-- **Canonical data model, denormalization/carry-down pattern** — [rdp-model/DATA_MODEL.md](../rdp-model/DATA_MODEL.md)
+- **Style guide (naming, column ordering, SQL conventions)** — [rdp-model/style-guide.md](../rdp-model/style-guide.md)
+- **Customer staging contract** — [rdp-model/contract.md](../rdp-model/contract.md)
+- **Canonical data model, denormalization/carry-down pattern** — [rdp-model/data-model.md](../rdp-model/data-model.md)
 - **Layer→schema mapping, key macros, component conventions** — [rdp-model/CONTRIBUTING.md](../rdp-model/CONTRIBUTING.md)
 - **Architecture decisions (ADRs)** — [rdp-docs/docs/architecture/](../rdp-docs/docs/architecture/)
