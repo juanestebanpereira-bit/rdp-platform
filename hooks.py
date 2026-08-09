@@ -29,6 +29,7 @@ REFERENCE_FILES = {
     "contract.md":          RDP / "contract.md",
     "data-model-index.md":  RDP / "data-model.md",
     "style-guide.md":       RDP / "style-guide.md",
+    "components.md":        RDP / "docs" / "components.md",
 }
 
 
