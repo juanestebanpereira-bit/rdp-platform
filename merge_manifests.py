@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Merge dbt manifests and catalogs from rtl_rdp_client and rtl_rdp into a single
+Merge dbt manifests and catalogs from rdp_client and rdp_model into a single
 unified pair, then run colibri generate.
 
 Key relationship:
-  rtl_rdp_client produces  model.rtl_rdp_client.stg_*  (in rdp_staging schema)
-  rtl_rdp consumes them as source.rtl_rdp.rdp_staging.stg_*  via source()
+  rdp_client produces  model.rdp_client.stg_*  (in rdp_staging schema)
+  rdp_model consumes them as source.rdp_model.rdp_staging.stg_*  via source()
 
-The merge rewires rtl_rdp nodes' depends_on to point directly at the
-model.rtl_rdp_client.stg_* nodes so lineage is continuous across the boundary.
+The merge rewires rdp_model nodes' depends_on to point directly at the
+model.rdp_client.stg_* nodes so lineage is continuous across the boundary.
 
 Outputs:
   Merged manifests/catalogs → build/                                             (intermediate, gitignored)
@@ -18,7 +18,7 @@ Outputs:
 Site (mkdocs.yml, docs_dir) lives in rdp-client, not here — this script
 stays in rdp-platform and writes its output across the sibling boundary.
 
-"Combined" refers only to the cross-project merge of rtl_rdp + rtl_rdp_client.
+"Combined" refers only to the cross-project merge of rdp_model + rdp_client.
 Lineage is always scoped per component — there is no cross-component aggregation.
 
 Usage:
@@ -49,13 +49,13 @@ def load(path: Path) -> dict:
 
 def build_source_to_model(rdp_manifest: dict, client_manifest: dict) -> dict:
     """
-    Map each source.rtl_rdp.rdp_staging.stg_X  →  model.rtl_rdp_client.stg_X
+    Map each source.rdp_model.rdp_staging.stg_X  →  model.rdp_client.stg_X
     Only includes entries where the matching client model actually exists.
     """
     mapping = {}
     for source_key, source_node in rdp_manifest["sources"].items():
         table_name = source_node["name"]           # e.g. "stg_items"
-        model_key  = f"model.rtl_rdp_client.{table_name}"
+        model_key  = f"model.rdp_client.{table_name}"
         if model_key in client_manifest["nodes"]:
             mapping[source_key] = model_key
     return mapping
@@ -96,8 +96,8 @@ def merge_manifests(client: dict, rdp: dict, source_to_model: dict) -> dict:
     merged = {s: {**client.get(s, {}), **rdp.get(s, {})} for s in simple_sections}
 
     # ── sources: keep client sources + rdp non-staging sources only ───────
-    # The rdp staging sources (source.rtl_rdp.rdp_staging.*) are dropped because
-    # they are fully replaced by the direct model.rtl_rdp_client.stg_* nodes.
+    # The rdp staging sources (source.rdp_model.rdp_staging.*) are dropped because
+    # they are fully replaced by the direct model.rdp_client.stg_* nodes.
     # Keeping them would render duplicate stg_* nodes in the lineage graph.
     rdp_staging_source_keys = set(source_to_model.keys())
     merged["sources"] = {
@@ -109,9 +109,9 @@ def merge_manifests(client: dict, rdp: dict, source_to_model: dict) -> dict:
     # ── metadata ──────────────────────────────────────────────────────────
     merged["metadata"] = {**client["metadata"], "project_name": "merged"}
 
-    # ── rewire depends_on in every rtl_rdp node ────────────────────────────
+    # ── rewire depends_on in every rdp_model node ────────────────────────────
     for node_key, node in merged["nodes"].items():
-        if ".rtl_rdp." not in node_key:
+        if ".rdp_model." not in node_key:
             continue
         deps = node.get("depends_on", {}).get("nodes", [])
         remapped = remap(deps, source_to_model)
