@@ -67,7 +67,7 @@ def _copy_component_docs(docs_dir: Path) -> None:
 
 
 def _load_doc_blocks() -> dict:
-    """Parse all {% docs name %}...{% enddocs %} blocks from rtl_rdp/models/*.md."""
+    """Parse all {% docs name %}...{% enddocs %} blocks from rdp-model/models/*.md."""
     docs = {}
     for md_file in (RDP / "models").glob("*.md"):
         for m in re.finditer(
