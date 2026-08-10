@@ -28,7 +28,7 @@ dbt run --select +model_name          # Run model and all upstream dependencies
 dbt test                              # Run all data quality tests
 dbt test --select model_name          # Test a specific model
 dbt test --select test_type:unique    # Run tests of a specific type
-dbt docs generate                     # Generate documentation
+dbt docs generate                     # Generate manifest.json/catalog.json (NOT the site — see below)
 dbt clean                             # Remove target/ and dbt_packages/
 ```
 
@@ -48,6 +48,11 @@ dbt-env/bin/dbterd run \
   -ofn erd.md
 ```
 
+None of the above updates the customer site by itself — see
+[README.md](README.md), "Common commands: dbt model → customer site",
+for the full sequence ending in `mkdocs build` (in `rdp-client`), which
+is the step that actually rebuilds it.
+
 > Note: `../rdp-model/.claude/settings.local.json` only permits `dbt compile` by default.
 
 ## Architecture
@@ -59,4 +64,4 @@ Full architecture detail lives in `rdp-model`, not here:
 - **Customer staging contract** — [rdp-model/contract.md](../rdp-model/contract.md)
 - **Canonical data model, denormalization/carry-down pattern** — [rdp-model/data-model.md](../rdp-model/data-model.md)
 - **Layer→schema mapping, key macros, component conventions** — [rdp-model/CONTRIBUTING.md](../rdp-model/CONTRIBUTING.md)
-- **Architecture decisions (ADRs)** — [rdp-docs/docs/architecture/](../rdp-docs/docs/architecture/)
+- **Architecture decisions (ADRs)** — [rdp-docs/docs/decisions/](../rdp-docs/docs/decisions/)
