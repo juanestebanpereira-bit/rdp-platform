@@ -26,10 +26,10 @@ BASE = _here if (_here / "rdp-model").exists() else _here.parent
 RDP  = BASE / "rdp-model"
 
 REFERENCE_FILES = {
-    "contract.md":          RDP / "contract.md",
-    "data-model-index.md":  RDP / "data-model.md",
-    "style-guide.md":       RDP / "style-guide.md",
-    "components.md":        RDP / "docs" / "components.md",
+    "implementation-guide.md":  RDP / "implementation-guide.md",
+    "data-model-index.md":      RDP / "data-model.md",
+    "style-guide.md":           RDP / "style-guide.md",
+    "components.md":            RDP / "docs" / "components.md",
 }
 
 

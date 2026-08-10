@@ -61,7 +61,7 @@ Full architecture detail lives in `rdp-model`, not here:
 
 - **Data flow, layer overview** — [rdp-model/README.md](../rdp-model/README.md)
 - **Style guide (naming, column ordering, SQL conventions)** — [rdp-model/style-guide.md](../rdp-model/style-guide.md)
-- **Customer staging contract** — [rdp-model/contract.md](../rdp-model/contract.md)
+- **Customer staging contract** — [rdp-model/implementation-guide.md](../rdp-model/implementation-guide.md)
 - **Canonical data model, denormalization/carry-down pattern** — [rdp-model/data-model.md](../rdp-model/data-model.md)
 - **Layer→schema mapping, key macros, component conventions** — [rdp-model/CONTRIBUTING.md](../rdp-model/CONTRIBUTING.md)
 - **Architecture decisions (ADRs)** — [rdp-docs/docs/decisions/](../rdp-docs/docs/decisions/)

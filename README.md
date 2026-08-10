@@ -101,7 +101,7 @@ dbt-env/bin/dbterd run \
   -ofn erd.md
 
 # 5. Build or preview the customer site. This is the step that actually
-#    assembles everything above, plus contract.md / style-guide.md /
+#    assembles everything above, plus implementation-guide.md / style-guide.md /
 #    data-model.md / components.md / each component's overview.md
 #    (copied from rdp-model), and the data dictionary (generated from
 #    schema.yml). Pick one:
@@ -129,6 +129,6 @@ regenerate all of them.
 
 ## Further Reading
 
-- `../rdp-model/contract.md` — customer staging contract and column documentation guide
+- `../rdp-model/implementation-guide.md` — customer staging contract and column documentation guide
 - `../rdp-model/CONTRIBUTING.md` — developer guide: folder conventions, tool choices, adding components
 - `../rdp-model/style-guide.md` — SQL and dbt coding standards
