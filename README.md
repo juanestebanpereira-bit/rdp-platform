@@ -61,14 +61,21 @@ rebuilds the site, and it depends on the artifacts every step before it
 produces.
 
 ```bash
-# 1. Run the dbt models. rdp-client (staging) must run before rdp-model
-#    (canonical) — rdp-model reads rdp-client's staging views via source().
+# 1. Run the dbt models for one subject area. rdp-client (staging) must
+#    run before rdp-model (canonical) — rdp-model reads rdp-client's
+#    staging views via source().
 cd ../rdp-client
 dbt deps   # only needed after packages.yml changes
-dbt run
+dbt run --select path:models/staging/products
+# Or, to run every subject area at once: dbt run
+# Or, a single model: dbt run --select stg_departments
 
 cd ../rdp-model
-dbt run
+dbt run --select path:models/temp/products+
+# The trailing + also runs everything downstream of temp/products
+# (dwh, dwh_views) in this same command.
+# Or, to run every subject area at once: dbt run
+# Or, a single model: dbt run --select int_departments
 
 # 2. Generate dbt artifacts (manifest.json / catalog.json) in both projects.
 #    `dbt run` does not produce these — lineage, ERD, and the data
