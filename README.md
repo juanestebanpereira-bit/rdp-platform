@@ -93,19 +93,27 @@ dbt-env/bin/dbterd run \
   -o ../rdp-client/docs/subject_areas/products/product_hierarchy \
   -ofn erd.md
 
-# 5. Build the customer site. This is the step that actually assembles
-#    everything above, plus contract.md / style-guide.md / data-model.md /
-#    components.md / each component's overview.md (copied from rdp-model),
-#    and the data dictionary (generated from schema.yml).
+# 5. Build or preview the customer site. This is the step that actually
+#    assembles everything above, plus contract.md / style-guide.md /
+#    data-model.md / components.md / each component's overview.md
+#    (copied from rdp-model), and the data dictionary (generated from
+#    schema.yml). Pick one:
 cd ../rdp-client
+
+# 5a. One-off static build, written to site/.
+#     Home page: rdp-client/site/index.html
 mkdocs build
+
+# 5b. Live-reloading local preview instead of 5a — watches docs/ and
+#     mkdocs.yml, rebuilds on save, serves at http://127.0.0.1:8000,
+#     writes nothing to disk. Must stay running (its own terminal or a
+#     background job) to stay reachable.
+mkdocs serve
 ```
 
-**Output:** `rdp-client/site/index.html` — open directly in a browser.
-
-For a live-reloading local preview instead of a one-off build, replace
-step 5 with `mkdocs serve` (run from `rdp-client`) and open
-`http://127.0.0.1:8000` — nothing is written to disk.
+**Output:** 5a writes `rdp-client/site/index.html` — open directly in
+a browser. 5b writes nothing; open `http://127.0.0.1:8000` instead
+while it's running.
 
 Steps 3–4 operate on one component at a time; repeat them (with a
 different `--subject-area`/`--component`/`-o` path) for each additional
